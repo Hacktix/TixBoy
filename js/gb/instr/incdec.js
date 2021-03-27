@@ -26,7 +26,7 @@ for(let i = 0x04; i <= 0x3c; i += 0x08) {
     else
         funcmap[i] = ((target) => {
             registers.flag_h = (tmp[0] & 0xf) === 0xf;
-            let v = (tmp.pop() + 1) & 0xff;
+            let v = (registers[target] + 1) & 0xff;
             registers.flag_z = v === 0;
             registers.flag_n = false;
             registers[target] = v;
