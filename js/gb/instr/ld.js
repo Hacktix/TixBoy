@@ -288,3 +288,18 @@ function _ld_u16_sp(cycle) {
     }
 }
 funcmap[0x08] = _ld_u16_sp;
+
+
+
+//-------------------------------------------------------------------------------
+// LD SP, HL
+//-------------------------------------------------------------------------------
+function _ld_sp_hl(cycle) {
+    if(!cycle)
+        nextfunc = _ld_sp_hl.bind(this, 1);
+    else {
+        registers.sp = registers.hl;
+        nextfunc = fetchInstruction;
+    }
+}
+funcmap[0xf9] = _ld_sp_hl;
