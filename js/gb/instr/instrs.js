@@ -9,6 +9,11 @@ var funcmap = {
         intr_state.ime = false;
         nextfunc = fetchInstruction;
         //console.log(`  DI`);
+    },
+
+    0xfb: () => {
+        intr_state.ime_queue = true;
+        nextfunc = fetchInstruction;
     }
 };
 
