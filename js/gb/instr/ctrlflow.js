@@ -1,4 +1,72 @@
 //-------------------------------------------------------------------------------
+// CALL u16
+//-------------------------------------------------------------------------------
+function _call_u16(cycle) {
+    switch(cycle) {
+        default:
+            console.log(registers.pc.toString(16))
+            nextfunc = _call_u16.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _call_u16.bind(this, 2);
+            console.log(`  CALL u16 | read u16:lower`);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
+            nextfunc = _call_u16.bind(this, 3);
+            console.log(`  CALL u16 | read u16:upper`);
+            break;
+        case 3:
+            nextfunc = _call_u16.bind(this, 4);
+            console.log(`  CALL u16 | branch decision?`);
+            break;
+        case 4:
+            writeByte(--registers.sp, (registers.pc & 0xff00) >> 8);
+            nextfunc = _call_u16.bind(this, 5);
+            console.log(`  CALL u16 | write pc:upper->(--sp)`);
+            break;
+        case 5:
+            writeByte(--registers.sp, registers.pc & 0xff);
+            registers.pc = tmp.pop();
+            nextfunc = fetchInstruction;
+            console.log(`  CALL u16 | write pc:upper->(--sp)`);
+            break;
+    }
+}
+funcmap[0xcd] = _call_u16;
+
+
+
+//-------------------------------------------------------------------------------
+// JP u16
+//-------------------------------------------------------------------------------
+function _jp_u16(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _jp_u16.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _jp_u16.bind(this, 2);
+            //console.log("  JP u16 | read u16:lower");
+            break;
+        case 2:
+            registers.pc = (readByte(registers.pc) << 8) + tmp.pop();
+            nextfunc = _jp_u16.bind(this, 3);
+            //console.log("  JP u16 | read u16:upper");
+            break;
+        case 3:
+            nextfunc = fetchInstruction;
+            //console.log("  JP u16 | branch decision?");
+            break;
+    }
+}
+funcmap[0xc3] = _jp_u16;
+
+
+
+//-------------------------------------------------------------------------------
 // JR NZ, i8  //  JR Z, i8
 //-------------------------------------------------------------------------------
 function _jr_z(compare, cycle) {
