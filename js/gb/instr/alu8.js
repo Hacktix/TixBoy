@@ -101,7 +101,7 @@ function _cp_u8(cycle) {
         let cpv = readByte(registers.pc++);
         registers.flag_z = registers.a === cpv;
         registers.flag_n = true;
-        registers.flag_h = (((registers.a & 0xf) - (cpv & 0xf)) & 0x10) < 0;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
         registers.flag_c = cpv > registers.a;
         nextfunc = fetchInstruction;
         //console.log(`  CP a, u8 | read u8`);
@@ -121,7 +121,7 @@ function _sub_u8(cycle) {
         let cpv = readByte(registers.pc++);
         registers.flag_z = registers.a === cpv;
         registers.flag_n = true;
-        registers.flag_h = (((registers.a & 0xf) - (cpv & 0xf)) & 0x10) < 0;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
         registers.flag_c = cpv > registers.a;
         registers.a -= cpv;
         nextfunc = fetchInstruction;
