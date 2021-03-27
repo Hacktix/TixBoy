@@ -150,8 +150,8 @@ function _ld_a_r16(source, cycle) {
         //console.log(`  LD a, (${target}) | read a(${target})->a`);
     }
 }
-funcmap[0x0a] = _ld_r16_a.bind(this, "bc");
-funcmap[0x1a] = _ld_r16_a.bind(this, "de");
+funcmap[0x0a] = _ld_a_r16.bind(this, "bc");
+funcmap[0x1a] = _ld_a_r16.bind(this, "de");
 
 
 
