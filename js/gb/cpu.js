@@ -5,6 +5,9 @@ var CYCLE_COUNT = 0;
 // Include instruction mappings
 include('gb/instr/instrs.js');
 
+// Debug breakpoints cause CPU bad
+var debug_brk = [/*0xc8f7*/];
+
 // CPU Registers
 var registers = {
     // Internal register values
@@ -109,6 +112,8 @@ var nextfunc = fetchInstruction;
 
 // Function for fetching instructions to execute
 function fetchInstruction() {
+    if(debug_brk.includes(registers.pc) && intervalId !== null)
+        throw `Breakpoint hit: $${registers.pc.toString(16).padStart(4, '0')}`;
     let opcode = readByte(registers.pc++);
     if(funcmap[opcode] === undefined)
         throw `Encountered unknown opcode $${opcode.toString(16).padStart(2, '0')} at $${(registers.pc-1).toString(16).padStart(4, '0')}`;
@@ -128,6 +133,7 @@ function execBlock() {
             step();
     } catch(e) {
         clearInterval(intervalId);
+        intervalId = null;
         console.error(e);
     }
 }
