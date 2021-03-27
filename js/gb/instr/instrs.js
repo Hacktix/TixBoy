@@ -30,7 +30,6 @@ var funcmap = {
 // ------------------------------------------------------------------------------
 
 // LD r16, u16
-// (Except SP)
 function _ld_r16_u16(target, cycle) {
     switch(cycle) {
         default:
