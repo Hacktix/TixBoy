@@ -274,7 +274,7 @@ function _ld_u16_sp(cycle) {
             nextfunc = _ld_u16_sp.bind(this, 2);
             break;
         case 2:
-            tmp.push(tmp.pop() | readByte(registers.pc++));
+            tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = _ld_u16_sp.bind(this, 3);
             break;
         case 3:
