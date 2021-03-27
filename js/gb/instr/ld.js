@@ -117,3 +117,37 @@ function _ld_a_hlid(inc, cycle) {
 }
 funcmap[0x2a] = _ld_a_hlid.bind(this, 1);
 funcmap[0x3a] = _ld_a_hlid.bind(this, -1);
+
+
+
+//-------------------------------------------------------------------------------
+// LD (r16), A
+//-------------------------------------------------------------------------------
+function _ld_r16_a(target, cycle) {
+    if(!cycle)
+        nextfunc = _ld_r16_a.bind(this, target, 1);
+    else {
+        writeByte(registers[target], registers.a);
+        nextfunc = fetchInstruction;
+        console.log(`  LD (${target}), a | write a->(${target})`);
+    }
+}
+funcmap[0x02] = _ld_r16_a.bind(this, "bc");
+funcmap[0x12] = _ld_r16_a.bind(this, "de");
+
+
+
+//-------------------------------------------------------------------------------
+// LD A, (r16)
+//-------------------------------------------------------------------------------
+function _ld_a_r16(source, cycle) {
+    if(!cycle)
+        nextfunc = _ld_a_r16.bind(this, source, 1);
+    else {
+        registers.a = readByte(registers[source]);
+        nextfunc = fetchInstruction;
+        console.log(`  LD a, (${target}) | read a(${target})->a`);
+    }
+}
+funcmap[0x0a] = _ld_r16_a.bind(this, "bc");
+funcmap[0x1a] = _ld_r16_a.bind(this, "de");
