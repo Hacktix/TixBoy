@@ -11,6 +11,8 @@ function loadRom(bytes) {
     console.log(`Loaded ${bytes.length} bytes.`);
 }
 
+
+
 // Variable readRom function, adjustable for MBCs
 var readRom = function(addr) {
     return rom[addr];
@@ -42,4 +44,38 @@ function readByte(addr) {
     if(addr < 0xfeff) return 0xff;                    // "Not Usable" (TODO: Implement model-specific behavior)
     if(addr < 0xff80) return readIO(addr);            // I/O Registers
     if(addr < 0xffff) return hram[addr-0xff80];       // HRAM
+}
+
+
+
+// Variable writeRom function, adjustable for MBCs
+var writeRom = function(addr, val) {
+    // Ignore Writes to ROM
+}
+
+// Variable writeVram function, adjustable for CGB-mode
+var writeVram = function(addr, val) {
+    vram[addr-0x8000] = val;
+}
+
+// Variable writeWram function, adjustable for CGB-mode
+var writeWram = function(addr, val) {
+    wram[addr-0xc000] = val;
+}
+
+// Fixed function for writing to I/O registers
+function writeIO(addr, val) {
+    // TODO: Implement I/O Registers
+}
+
+function writeByte(addr, val) {
+    if(addr < 0x8000) writeRom(addr, val);           // ROM
+    if(addr < 0xa000) writeVram(addr, val);          // VRAM
+    if(addr < 0xc000) return;                        // SRAM (TODO: Add Support)
+    if(addr < 0xe000) writeWram(addr, val);          // WRAM
+    if(addr < 0xfe00) writeWram(addr - 0x1000, val); // Echo RAM
+    if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
+    if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
+    if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
+    if(addr < 0xffff) hram[addr-0xff80] = val;       // HRAM
 }
