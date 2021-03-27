@@ -31,7 +31,10 @@ var readWram = function(addr) {
 // Fixed function for reading from I/O registers
 function readIO(addr) {
     // TODO: Implement I/O Registers
-    return 0xff;
+    switch(addr) {
+        case 0xff0f: return intr_state.if;            // IF
+        default:     return 0xff;                     // Unmapped Register
+    }
 }
 
 function readByte(addr) {
@@ -44,6 +47,7 @@ function readByte(addr) {
     if(addr < 0xfeff) return 0xff;                    // "Not Usable" (TODO: Implement model-specific behavior)
     if(addr < 0xff80) return readIO(addr);            // I/O Registers
     if(addr < 0xffff) return hram[addr-0xff80];       // HRAM
+    return intr_state.ie;                             // IE
 }
 
 
@@ -66,6 +70,11 @@ var writeWram = function(addr, val) {
 // Fixed function for writing to I/O registers
 function writeIO(addr, val) {
     // TODO: Implement I/O Registers
+    switch(addr) {
+        case 0xff0f:                                 // IF
+            intr_state.if = val;
+            break;
+    }
 }
 
 function writeByte(addr, val) {
@@ -78,4 +87,5 @@ function writeByte(addr, val) {
     if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
     if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
     if(addr < 0xffff) hram[addr-0xff80] = val;       // HRAM
+    intr_state.ie = val;                             // IE
 }

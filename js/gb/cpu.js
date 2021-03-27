@@ -96,6 +96,14 @@ var registers = {
     },
 };
 
+// Interrupt-related CPU variables
+var intr_state = {
+    if: 0,
+    ie: 0,
+    ime: false,
+    ime_queue: false,
+};
+
 // Function pointer showing what to do on the next tick
 var nextfunc = fetchInstruction;
 

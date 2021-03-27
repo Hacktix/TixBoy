@@ -26,6 +26,13 @@ var funcmap = {
                 break;
         }
     },
+
+    // DI
+    0xf3: () => {
+        intr_state.ime = false;
+        nextfunc = fetchInstruction;
+        //console.log(`  DI`);
+    }
 };
 
 //-------------------------------------------------------------------------------
