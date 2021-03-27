@@ -14,12 +14,12 @@ function _jr_z(compare, cycle) {
                 tmp.push(v);
                 nextfunc = _jr_z.bind(this, compare, 2);
             }
-            console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | read`);
+            //console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | read`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | modify PC`);
+            //console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | modify PC`);
     }
 }
 funcmap[0x20] = _jr_z.bind(this, false);

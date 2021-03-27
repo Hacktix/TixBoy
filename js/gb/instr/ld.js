@@ -9,12 +9,12 @@ function _ld_r16_u16(target, cycle) {
         case 1:
             registers[target[1]] = readByte(registers.pc++);
             nextfunc = _ld_r16_u16.bind(this, target, 2);
-            console.log(`  LD ${target},u16 | read u16:lower->${target[1]}`);
+            //console.log(`  LD ${target},u16 | read u16:lower->${target[1]}`);
             break;
         case 2:
             registers[target[0]] = readByte(registers.pc++);
             nextfunc = fetchInstruction;
-            console.log(`  LD ${target},u16 | read u16:upper->${target[0]}`);
+            //console.log(`  LD ${target},u16 | read u16:upper->${target[0]}`);
             break;
     }
 }
@@ -30,7 +30,7 @@ function _ld_mem_hl_r8(source, target, cycle) {
     if(!cycle)
         nextfunc = _ld_mem_hl_r8.bind(this, source, target, 1);
     else {
-        console.log(`  LD ${target}, ${source} | read ${source}->${target}`);
+        //console.log(`  LD ${target}, ${source} | read ${source}->${target}`);
         if(source === "(hl)")
             registers[target] = readByte(registers.hl);
         else
@@ -46,7 +46,7 @@ for(let i = 0x40; i < 0x80; i++) {
     else
         funcmap[i] = ((source, target)=>{
             registers[target] = registers[source];
-            console.log(`  LD ${target}, ${source}`);
+            //console.log(`  LD ${target}, ${source}`);
             nextfunc = fetchInstruction;
         }).bind(this, src, dst);
 }
@@ -65,17 +65,17 @@ function _ld_r8_u8(target, cycle) {
             if(target === "(hl)") {
                 tmp.push(readByte(registers.pc++));
                 nextfunc = _ld_r8_u8.bind(this, target, 2);
-                console.log(`  LD ${target}, u8 | read u8`);
+                //console.log(`  LD ${target}, u8 | read u8`);
             } else {
                 registers[target] = readByte(registers.pc++);
                 nextfunc = fetchInstruction;
-                console.log(`  LD ${target}, u8 | read u8->${target}`);
+                //console.log(`  LD ${target}, u8 | read u8->${target}`);
             }
             break;
         case 2:
             writeByte(registers.hl, tmp.pop);
             nextfunc = fetchInstruction;
-            console.log(`  LD ${target}, u8 | write ${target}`);
+            //console.log(`  LD ${target}, u8 | write ${target}`);
             break;
     }
 }
@@ -93,7 +93,7 @@ function _ld_hlid_a(inc, cycle) {
     else {
         writeByte(registers.hl, registers.a);
         registers.hl += inc;
-        console.log(`  LD (hl${inc > 0 ? '+' : '-'}), a | write a->(hl${inc > 0 ? '++' : '--'})`)
+        //console.log(`  LD (hl${inc > 0 ? '+' : '-'}), a | write a->(hl${inc > 0 ? '++' : '--'})`)
         nextfunc = fetchInstruction;
     }
 }
@@ -111,7 +111,7 @@ function _ld_a_hlid(inc, cycle) {
     else {
         registers.a = readByte(registers.hl);
         registers.hl += inc;
-        console.log(`  LD a, (hl${inc > 0 ? '+' : '-'}) | write (hl${inc > 0 ? '++' : '--'})->a`)
+        //console.log(`  LD a, (hl${inc > 0 ? '+' : '-'}) | write (hl${inc > 0 ? '++' : '--'})->a`)
         nextfunc = fetchInstruction;
     }
 }
@@ -129,7 +129,7 @@ function _ld_r16_a(target, cycle) {
     else {
         writeByte(registers[target], registers.a);
         nextfunc = fetchInstruction;
-        console.log(`  LD (${target}), a | write a->(${target})`);
+        //console.log(`  LD (${target}), a | write a->(${target})`);
     }
 }
 funcmap[0x02] = _ld_r16_a.bind(this, "bc");
@@ -146,7 +146,7 @@ function _ld_a_r16(source, cycle) {
     else {
         registers.a = readByte(registers[source]);
         nextfunc = fetchInstruction;
-        console.log(`  LD a, (${target}) | read a(${target})->a`);
+        //console.log(`  LD a, (${target}) | read a(${target})->a`);
     }
 }
 funcmap[0x0a] = _ld_r16_a.bind(this, "bc");

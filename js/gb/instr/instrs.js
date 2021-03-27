@@ -13,16 +13,16 @@ var funcmap = {
             case 1:
                 tmp.push(readByte(registers.pc++));
                 nextfunc = funcmap[0xc3].bind(this, 2);
-                console.log("  JP u16 | read u16:lower");
+                //console.log("  JP u16 | read u16:lower");
                 break;
             case 2:
                 registers.pc = (readByte(registers.pc) << 8) + tmp.pop();
                 nextfunc = funcmap[0xc3].bind(this, 3);
-                console.log("  JP u16 | read u16:upper");
+                //console.log("  JP u16 | read u16:upper");
                 break;
             case 3:
                 nextfunc = fetchInstruction;
-                console.log("  JP u16 | branch decision?");
+                //console.log("  JP u16 | branch decision?");
                 break;
         }
     },

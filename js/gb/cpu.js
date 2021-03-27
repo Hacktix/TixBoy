@@ -102,13 +102,13 @@ var nextfunc = fetchInstruction;
 // Function for fetching instructions to execute
 function fetchInstruction() {
     let opcode = readByte(registers.pc++);
-    console.log(`  Fetched opcode $${opcode.toString(16).padStart(2, '0')}.`)
+    //console.log(`  Fetched opcode $${opcode.toString(16).padStart(2, '0')}.`)
     funcmap[opcode]();
 }
 
 // Wrapper for a single next-tick-function call
 function step() {
-    console.log(`* Cycle ${CYCLE_COUNT++} (PC: $${registers.pc.toString(16).padStart(4, '0')})`);
+    //console.log(`* Cycle ${CYCLE_COUNT++} (PC: $${registers.pc.toString(16).padStart(4, '0')})`);
     nextfunc();
 }
 
