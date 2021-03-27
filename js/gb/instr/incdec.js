@@ -88,3 +88,19 @@ function _inc_r16(target, cycle) {
 }
 for(let i = 0x03; i <= 0x33; i += 0x10)
     funcmap[i] = _inc_r16.bind(this, ["bc", "de", "hl", "sp"][(i & 0b110000) >> 4]);
+
+
+
+//-------------------------------------------------------------------------------
+// DEC r16
+//-------------------------------------------------------------------------------
+function _dec_r16(target, cycle) {
+    if(!cycle)
+        nextfunc = _dec_r16.bind(this, target, 1);
+    else {
+        registers[target]--;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x0b; i <= 0x3b; i += 0x10)
+    funcmap[i] = _dec_r16.bind(this, ["bc", "de", "hl", "sp"][(i & 0b110000) >> 4]);

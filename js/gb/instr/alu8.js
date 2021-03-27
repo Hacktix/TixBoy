@@ -55,6 +55,24 @@ for(let i = 0xa8; i < 0xb0; i++) {
 
 
 //-------------------------------------------------------------------------------
+// XOR A, u8
+//-------------------------------------------------------------------------------
+function _xor_u8(cycle) {
+    if(!cycle)
+        nextfunc = _xor_u8.bind(this, 1);
+    else {
+        registers.a ^= readByte(registers.pc++);
+        registers.flag_n = registers.flag_h = registers.flag_c = false;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+        //console.log(`  XOR a, (hl)`);
+    }
+}
+funcmap[0xee] = _xor_u8;
+
+
+
+//-------------------------------------------------------------------------------
 // CP A, u8
 //-------------------------------------------------------------------------------
 function _cp_u8(cycle) {
@@ -92,6 +110,27 @@ function _sub_u8(cycle) {
     }
 }
 funcmap[0xd6] = _sub_u8;
+
+
+
+//-------------------------------------------------------------------------------
+// ADD A, u8
+//-------------------------------------------------------------------------------
+function _add_u8(cycle) {
+    if(!cycle)
+        nextfunc = _add_u8.bind(this, 1);
+    else {
+        let addv = readByte(registers.pc++);
+        registers.flag_n = false;
+        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+        registers.flag_c = registers.a + addv > 0xff;
+        registers.a += addv;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+        //console.log(`  ADD a, u8`);
+    }
+}
+funcmap[0xc6] = _add_u8;
 
 
 
