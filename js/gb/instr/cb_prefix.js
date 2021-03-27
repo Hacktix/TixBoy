@@ -104,6 +104,6 @@ for(let i = 0x30; i <= 0x37; i++) {
         registers.flag_c = registers.flag_h = registers.flag_n = false;
         registers.flag_z = registers[target] === 0;
         nextfunc = fetchInstruction;
-        console.log(`  SWAP ${target} ${registers.pc.toString(16)}`)
+        //console.log(`  SWAP ${target}`)
     }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
 }
