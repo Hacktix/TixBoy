@@ -6,21 +6,21 @@ var CYCLE_COUNT = 0;
 include('gb/instr/instrs.js');
 
 // Debug breakpoints cause CPU bad
-var debug_brk = [/*0xc8f7*/];
+var debug_brk = [0xcc61];
 
 // CPU Registers
 var registers = {
     // Internal register values
-    _a: 0,
-    _f: 0,
-    _b: 0,
-    _c: 0,
-    _d: 0,
-    _e: 0,
-    _h: 0,
-    _l: 0,
+    _a: 0x01,
+    _f: 0xb0,
+    _b: 0x00,
+    _c: 0x13,
+    _d: 0x00,
+    _e: 0xd8,
+    _h: 0x01,
+    _l: 0x4d,
     _pc: 0x100,
-    _sp: 0,
+    _sp: 0xfffe,
 
     // 8-bit Getters
     get a() { return this._a; },
@@ -110,8 +110,15 @@ var intr_state = {
 // Function pointer showing what to do on the next tick
 var nextfunc = fetchInstruction;
 
+// Debug log string for later download
+var dbg_log = "";
+
 // Function for fetching instructions to execute
 function fetchInstruction() {
+
+    // Debug Logging
+    dbg_log += `A: ${registers.a.toString(16).padStart(2, '0')} F: ${registers.f.toString(16).padStart(2, '0')} B: ${registers.b.toString(16).padStart(2, '0')} C: ${registers.c.toString(16).padStart(2, '0')} D: ${registers.d.toString(16).padStart(2, '0')} E: ${registers.e.toString(16).padStart(2, '0')} H: ${registers.h.toString(16).padStart(2, '0')} L: ${registers.l.toString(16).padStart(2, '0')} SP: ${registers.sp.toString(16).padStart(4, '0')} PC: 00:${registers.pc.toString(16).padStart(4, '0')} (${readByte(registers.pc).toString(16).padStart(2, '0')} ${readByte(registers.pc+1).toString(16).padStart(2, '0')} ${readByte(registers.pc+2).toString(16).padStart(2, '0')} ${readByte(registers.pc+3).toString(16).padStart(2, '0')})\n`.toUpperCase();
+    
     if(debug_brk.includes(registers.pc) && intervalId !== null)
         throw `Breakpoint hit: $${registers.pc.toString(16).padStart(4, '0')}`;
     let opcode = readByte(registers.pc++);
@@ -134,6 +141,7 @@ function execBlock() {
     } catch(e) {
         clearInterval(intervalId);
         intervalId = null;
+        download("log.txt", dbg_log);
         console.error(e);
     }
 }
