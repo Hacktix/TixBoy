@@ -21,7 +21,7 @@ var registers = {
 
     // 8-bit Getters
     get a() { return this._a; },
-    get f() { return this._f | 0b00001111; },
+    get f() { return this._f; },
     get b() { return this._b; },
     get c() { return this._c; },
     get d() { return this._d; },
