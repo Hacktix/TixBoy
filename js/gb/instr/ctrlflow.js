@@ -173,3 +173,47 @@ function _jr_c(compare, cycle) {
 }
 funcmap[0x30] = _jr_c.bind(this, false);
 funcmap[0x38] = _jr_c.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// RET NC  //  RET C
+//-------------------------------------------------------------------------------
+function _ret_c(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ret_c.bind(this, compare, 1);
+            break;
+        case 1:
+            if(registers.flag_c !== compare)
+                nextfunc = fetchInstruction;
+            else
+                nextfunc = _ret.bind(this, 1);
+            //console.log(`  RET ${compare ? 'C' : 'NC'} | branch decision`);
+            break;
+    }
+}
+funcmap[0xd0] = _ret_c.bind(this, false);
+funcmap[0xd8] = _ret_c.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// RET NZ  //  RET Z
+//-------------------------------------------------------------------------------
+function _ret_z(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ret_z.bind(this, compare, 1);
+            break;
+        case 1:
+            if(registers.flag_z !== compare)
+                nextfunc = fetchInstruction;
+            else
+                nextfunc = _ret.bind(this, 1);
+            //console.log(`  RET ${compare ? 'Z' : 'NZ'} | branch decision`);
+            break;
+    }
+}
+funcmap[0xc0] = _ret_z.bind(this, false);
+funcmap[0xc8] = _ret_z.bind(this, true);

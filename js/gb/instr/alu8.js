@@ -80,7 +80,7 @@ function _adc_u8(cycle) {
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        console.log(`  ADC a, u8`);
+        //console.log(`  ADC a, u8`);
     }
 }
 funcmap[0xce] = _adc_u8;
