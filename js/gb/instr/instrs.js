@@ -20,3 +20,4 @@ include("gb/instr/ld.js");
 include("gb/instr/incdec.js");
 include("gb/instr/ctrlflow.js");
 include("gb/instr/stack.js");
+include("gb/instr/alu8.js");

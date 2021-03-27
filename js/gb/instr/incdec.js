@@ -83,7 +83,7 @@ function _inc_r16(target, cycle) {
     else {
         registers[target]++;
         nextfunc = fetchInstruction;
-        console.log(`  INC ${target}`);
+        //console.log(`  INC ${target}`);
     }
 }
 for(let i = 0x03; i <= 0x33; i += 0x10)
