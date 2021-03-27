@@ -133,6 +133,27 @@ funcmap[0xd6] = _sub_u8;
 
 
 //-------------------------------------------------------------------------------
+// SBC A, u8
+//-------------------------------------------------------------------------------
+function _sbc_u8(cycle) {
+    if(!cycle)
+        nextfunc = _sbc_u8.bind(this, 1);
+    else {
+        let cpv = (readByte(registers.pc++) + registers.flag_c) & 0xff;
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
+        registers.flag_c = cpv > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+        // console.log(`  SUB a, u8 | read u8`);
+    }
+}
+funcmap[0xde] = _sbc_u8;
+
+
+
+//-------------------------------------------------------------------------------
 // ADD A, u8
 //-------------------------------------------------------------------------------
 function _add_u8(cycle) {
