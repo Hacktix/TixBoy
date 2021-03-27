@@ -47,6 +47,10 @@ var registers = {
     set h(v) { this._h = v & 0xff },
     set l(v) { this._l = v & 0xff },
 
+    // 8-bit SP Setters (because I'm lazy)
+    set s(v) { this._sp = (v << 8) | (this._sp & 0xff); },
+    set p(v) { this._sp = (this._sp & 0xff00) | v; },
+
     // 16-bit Setters
     set af(v) {
         this.a = (v & 0xff00) >> 8;
