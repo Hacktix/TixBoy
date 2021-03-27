@@ -35,6 +35,7 @@ function _ld_mem_hl_r8(source, target, cycle) {
             registers[target] = readByte(registers.hl);
         else
             writeByte(registers.hl, registers[source]);
+        nextfunc = fetchInstruction;
     }
 }
 for(let i = 0x40; i < 0x80; i++) {

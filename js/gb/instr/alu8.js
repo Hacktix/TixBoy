@@ -8,6 +8,7 @@ function _or_mem_hl(cycle) {
         registers.a |= readByte(registers.hl);
         registers.flag_n = registers.flag_h = registers.flag_c = false;
         registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
         //console.log(`  OR a, (hl)`);
     }
 }
