@@ -36,12 +36,12 @@ function _pop_r16(destination, cycle) {
         case 1:
             registers[destination[1]] = readByte(registers.sp++);
             nextfunc = _pop_r16.bind(this, destination, 2);
-            console.log(`  POP ${destination} | read (sp++)->${destination[1]}`);
+            //console.log(`  POP ${destination} | read (sp++)->${destination[1]}`);
             break;
         case 2:
             registers[destination[0]] = readByte(registers.sp++);
             nextfunc = fetchInstruction;
-            console.log(`  POP ${destination} | read (sp++)->${destination[0]}`);
+            //console.log(`  POP ${destination} | read (sp++)->${destination[0]}`);
             break;
     }
 }

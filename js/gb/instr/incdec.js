@@ -71,3 +71,20 @@ for(let i = 0x05; i <= 0x3d; i += 0x08) {
             //console.log(`  DEC ${target}`);
         }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][(i & 0b111000) >> 3])
 }
+
+
+
+//-------------------------------------------------------------------------------
+// INC r16
+//-------------------------------------------------------------------------------
+function _inc_r16(target, cycle) {
+    if(!cycle)
+        nextfunc = _inc_r16.bind(this, target, 1);
+    else {
+        registers[target]++;
+        nextfunc = fetchInstruction;
+        console.log(`  INC ${target}`);
+    }
+}
+for(let i = 0x03; i <= 0x33; i += 0x10)
+    funcmap[i] = _inc_r16.bind(this, ["bc", "de", "hl", "sp"][(i & 0b110000) >> 4]);
