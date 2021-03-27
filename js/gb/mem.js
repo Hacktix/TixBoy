@@ -71,6 +71,9 @@ var writeWram = function(addr, val) {
 function writeIO(addr, val) {
     // TODO: Implement I/O Registers
     switch(addr) {
+        case 0xff01:
+            document.getElementById("dbgout").innerHTML += String.fromCharCode(val);
+            break;
         case 0xff0f:                                 // IF
             intr_state.if = val;
             break;
