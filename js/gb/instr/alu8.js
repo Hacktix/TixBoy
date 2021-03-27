@@ -55,6 +55,25 @@ for(let i = 0xa8; i < 0xb0; i++) {
 
 
 //-------------------------------------------------------------------------------
+// AND A, u8
+//-------------------------------------------------------------------------------
+function _and_u8(cycle) {
+    if(!cycle)
+        nextfunc = _and_u8.bind(this, 1);
+    else {
+        registers.a &= readByte(registers.pc++);
+        registers.flag_n = registers.flag_c = false;
+        registers.flag_h = true;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+        //console.log(`  AND a, u8`);
+    }
+}
+funcmap[0xe6] = _and_u8;
+
+
+
+//-------------------------------------------------------------------------------
 // XOR A, u8
 //-------------------------------------------------------------------------------
 function _xor_u8(cycle) {
