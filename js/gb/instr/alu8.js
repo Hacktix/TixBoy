@@ -38,7 +38,7 @@ function _cp_u8(cycle) {
         registers.flag_h = (((registers.a & 0xf) - (cpv & 0xf)) & 0x10) < 0;
         registers.flag_c = cpv > registers.a;
         nextfunc = fetchInstruction;
-        console.log(`  CP a, u8 | read u8`);
+        //console.log(`  CP a, u8 | read u8`);
     }
 }
 funcmap[0xfe] = _cp_u8;
