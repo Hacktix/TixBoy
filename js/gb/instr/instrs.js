@@ -33,3 +33,4 @@ var funcmap = {
 // ------------------------------------------------------------------------------
 
 include("gb/instr/ld.js");
+include("gb/instr/incdec.js");
