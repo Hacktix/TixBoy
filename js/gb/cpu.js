@@ -70,6 +70,24 @@ var registers = {
     },
     set pc(v) { this._pc = v & 0xffff; },
     set sp(v) { this._sp = v & 0xffff; },
+
+    // Flag Setters (also because im lazy)
+    set flag_z(v) {
+        if(v) this._f |= 0b10000000;
+        else this._f &= 0b01111111;
+    },
+    set flag_n(v) {
+        if(v) this._f |= 0b01000000;
+        else this._f &= 0b10111111;
+    },
+    set flag_h(v) {
+        if(v) this._f |= 0b00100000;
+        else this._f &= 0b11011111;
+    },
+    set flag_c(v) {
+        if(v) this._f |= 0b00010000;
+        else this._f &= 0b11101111;
+    },
 };
 
 // Function pointer showing what to do on the next tick
