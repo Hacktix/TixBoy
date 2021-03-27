@@ -231,12 +231,12 @@ function _call_z(compare, cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_z.bind(this, compare, 2);
-            console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:lower`);
+            //console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = registers.flag_z === compare ? _call_u16.bind(this, 3) : fetchInstruction;
-            console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:upper`);
+            //console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:upper`);
             break;
     }
 }
@@ -256,12 +256,12 @@ function _call_c(compare, cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_c.bind(this, compare, 2);
-            console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:lower`);
+            //console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = registers.flag_c === compare ? _call_u16.bind(this, 3) : fetchInstruction;
-            console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:upper`);
+            //console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:upper`);
             break;
     }
 }

@@ -27,6 +27,34 @@ for(let i = 0xb0; i < 0xb8; i++) {
 
 
 //-------------------------------------------------------------------------------
+// XOR A, r8
+//-------------------------------------------------------------------------------
+function _xor_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _xor_mem_hl.bind(this, 1);
+    else {
+        registers.a ^= readByte(registers.hl);
+        registers.flag_n = registers.flag_h = registers.flag_c = false;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+        console.log(`  XOR a, (hl)`);
+    }
+}
+for(let i = 0xa8; i < 0xb0; i++) {
+    if(i === 0xae)
+        funcmap[i] = _xor_mem_hl;
+    else
+        funcmap[i] = ((source) => {
+            registers.a ^= registers[source];
+            registers.flag_n = registers.flag_h = registers.flag_c = false;
+            registers.flag_z = registers.a === 0;
+            console.log(`  XOR a, ${source}`);
+        }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
+}
+
+
+
+//-------------------------------------------------------------------------------
 // CP A, u8
 //-------------------------------------------------------------------------------
 function _cp_u8(cycle) {
