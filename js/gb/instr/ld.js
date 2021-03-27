@@ -204,3 +204,27 @@ function _ldh_u8_a(cycle) {
     }
 }
 funcmap[0xe0] = _ldh_u8_a;
+
+
+
+//-------------------------------------------------------------------------------
+// LD A, (FF00+u8)
+//-------------------------------------------------------------------------------
+function _ldh_a_u8(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ldh_a_u8.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _ldh_a_u8.bind(this, 2);
+            console.log(`  LD a, (FF00+u8) | read u8`);
+            break;
+        case 2:
+            registers.a = readByte(0xff00+tmp.pop());
+            nextfunc = fetchInstruction;
+            console.log(`  LD a, (FF00+u8) | read (ff00+u8)->a`);
+            break;
+    }
+}
+funcmap[0xf0] = _ldh_a_u8;
