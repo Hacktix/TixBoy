@@ -110,7 +110,8 @@ var nextfunc = fetchInstruction;
 // Function for fetching instructions to execute
 function fetchInstruction() {
     let opcode = readByte(registers.pc++);
-    //console.log(`  Fetched opcode $${opcode.toString(16).padStart(2, '0')}.`)
+    if(funcmap[opcode] === undefined)
+        throw `Encountered unknown opcode $${opcode.toString(16).padStart(2, '0')} at $${(registers.pc-1).toString(16).padStart(4, '0')}`;
     funcmap[opcode]();
 }
 
@@ -127,7 +128,6 @@ function execBlock() {
             step();
     } catch(e) {
         clearInterval(intervalId);
-        console.error(`Encountered unknown opcode $${readByte(--registers.pc).toString(16).padStart(2, '0')} at $${registers.pc.toString(16).padStart(4, '0')}`);
         console.error(e);
     }
 }

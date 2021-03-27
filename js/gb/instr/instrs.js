@@ -22,3 +22,4 @@ include("gb/instr/ctrlflow.js");
 include("gb/instr/stack.js");
 include("gb/instr/alu8.js");
 include("gb/instr/bitops.js");
+include("gb/instr/cb_prefix.js");
