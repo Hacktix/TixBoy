@@ -242,7 +242,12 @@ function _call_z(compare, cycle) {
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
-            nextfunc = registers.flag_z === compare ? _call_u16.bind(this, 3) : fetchInstruction;
+            if(registers.flag_z === compare)
+                nextfunc =  _call_u16.bind(this, 3);
+            else {
+                tmp.pop();
+                nextfunc = fetchInstruction;
+            }
             //console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:upper`);
             break;
     }
@@ -267,7 +272,12 @@ function _call_c(compare, cycle) {
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
-            nextfunc = registers.flag_c === compare ? _call_u16.bind(this, 3) : fetchInstruction;
+            if(registers.flag_c === compare)
+                nextfunc =  _call_u16.bind(this, 3);
+            else {
+                tmp.pop();
+                nextfunc = fetchInstruction;
+            }
             //console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:upper`);
             break;
     }
