@@ -59,7 +59,7 @@ function _sub_u8(cycle) {
         registers.flag_c = cpv > registers.a;
         registers.a -= cpv;
         nextfunc = fetchInstruction;
-        console.log(`  SUB a, u8 | read u8`);
+        // console.log(`  SUB a, u8 | read u8`);
     }
 }
 funcmap[0xd6] = _sub_u8;

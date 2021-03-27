@@ -144,3 +144,32 @@ function _jr_z(compare, cycle) {
 }
 funcmap[0x20] = _jr_z.bind(this, false);
 funcmap[0x28] = _jr_z.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// JR NC, i8  //  JR C, i8
+//-------------------------------------------------------------------------------
+function _jr_c(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _jr_c.bind(this, compare, 1);
+            break;
+        case 1:
+            let v = e8(readByte(registers.pc++));
+            if(registers.flag_c !== compare)
+                nextfunc = fetchInstruction;
+            else {
+                tmp.push(v);
+                nextfunc = _jr_c.bind(this, compare, 2);
+            }
+            console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | read`);
+            break;
+        case 2:
+            registers.pc += tmp.pop();
+            nextfunc = fetchInstruction;
+            console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | modify PC`);
+    }
+}
+funcmap[0x30] = _jr_c.bind(this, false);
+funcmap[0x38] = _jr_c.bind(this, true);
