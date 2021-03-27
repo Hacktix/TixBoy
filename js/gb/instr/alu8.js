@@ -63,3 +63,24 @@ function _sub_u8(cycle) {
     }
 }
 funcmap[0xd6] = _sub_u8;
+
+
+
+//-------------------------------------------------------------------------------
+// ADC A, u8
+//-------------------------------------------------------------------------------
+function _adc_u8(cycle) {
+    if(!cycle)
+        nextfunc = _adc_u8.bind(this, 1);
+    else {
+        let addv = (readByte(registers.pc++) + registers.flag_c) & 0xff;
+        registers.flag_n = false;
+        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+        registers.flag_c = registers.a + addv > 0xff;
+        registers.a += addv;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+        console.log(`  ADC a, u8`);
+    }
+}
+funcmap[0xce] = _adc_u8;

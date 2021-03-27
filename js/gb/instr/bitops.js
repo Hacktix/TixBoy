@@ -6,5 +6,5 @@ funcmap[0x1f] = () => {
     registers.flag_c = (registers.a & 1) > 0;
     registers.a = (registers.a >> 1) | rv;
     registers.flag_h = registers.flag_n = registers.flag_z = false;
-    console.log(`  RRA`);
+    //console.log(`  RRA`);
 };
