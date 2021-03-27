@@ -4,33 +4,32 @@
 function _call_u16(cycle) {
     switch(cycle) {
         default:
-            console.log(registers.pc.toString(16))
             nextfunc = _call_u16.bind(this, 1);
             break;
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_u16.bind(this, 2);
-            console.log(`  CALL u16 | read u16:lower`);
+            //console.log(`  CALL u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = _call_u16.bind(this, 3);
-            console.log(`  CALL u16 | read u16:upper`);
+            //console.log(`  CALL u16 | read u16:upper`);
             break;
         case 3:
             nextfunc = _call_u16.bind(this, 4);
-            console.log(`  CALL u16 | branch decision?`);
+            //console.log(`  CALL u16 | branch decision?`);
             break;
         case 4:
             writeByte(--registers.sp, (registers.pc & 0xff00) >> 8);
             nextfunc = _call_u16.bind(this, 5);
-            console.log(`  CALL u16 | write pc:upper->(--sp)`);
+            //console.log(`  CALL u16 | write pc:upper->(--sp)`);
             break;
         case 5:
             writeByte(--registers.sp, registers.pc & 0xff);
             registers.pc = tmp.pop();
             nextfunc = fetchInstruction;
-            console.log(`  CALL u16 | write pc:upper->(--sp)`);
+            //console.log(`  CALL u16 | write pc:upper->(--sp)`);
             break;
     }
 }
@@ -63,6 +62,30 @@ function _jp_u16(cycle) {
     }
 }
 funcmap[0xc3] = _jp_u16;
+
+
+
+//-------------------------------------------------------------------------------
+// JR e8
+//-------------------------------------------------------------------------------
+function _jr_e8(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _jr_e8.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(e8(readByte(registers.pc++)));
+            nextfunc = _jr_e8.bind(this, 2);
+            console.log(`  JR i8 | read i8`);
+            break;
+        case 2:
+            registers.pc += tmp.pop();
+            nextfunc = fetchInstruction;
+            console.log(`  JR i8 | modify pc`);
+            break;
+    }
+}
+funcmap[0x18] = _jr_e8;
 
 
 
