@@ -1,5 +1,6 @@
 const CLOCK_FREQ = 4194304;
 const BLOCK_SIZE = 5000;
+const DEBUG_LOG_DOWNLOAD = false;
 var CYCLE_COUNT = 0;
 
 const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
@@ -8,7 +9,7 @@ const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
 include('gb/instr/instrs.js');
 
 // Debug breakpoints cause CPU bad
-var debug_brk = [0xcc61];
+var debug_brk = [];
 
 // CPU Registers
 var registers = {
@@ -119,7 +120,7 @@ var dbg_log = "";
 function fetchInstruction() {
 
     // Debug Logging
-    if(DEBUG_LOG_CHECKBOX.checked)
+    if(DEBUG_LOG_DOWNLOAD)
         dbg_log += `A: ${registers.a.toString(16).padStart(2, '0')} F: ${registers.f.toString(16).padStart(2, '0')} B: ${registers.b.toString(16).padStart(2, '0')} C: ${registers.c.toString(16).padStart(2, '0')} D: ${registers.d.toString(16).padStart(2, '0')} E: ${registers.e.toString(16).padStart(2, '0')} H: ${registers.h.toString(16).padStart(2, '0')} L: ${registers.l.toString(16).padStart(2, '0')} SP: ${registers.sp.toString(16).padStart(4, '0')} PC: 00:${registers.pc.toString(16).padStart(4, '0')} (${readByte(registers.pc).toString(16).padStart(2, '0')} ${readByte(registers.pc+1).toString(16).padStart(2, '0')} ${readByte(registers.pc+2).toString(16).padStart(2, '0')} ${readByte(registers.pc+3).toString(16).padStart(2, '0')})\n`.toUpperCase();
 
     if(debug_brk.includes(registers.pc) && intervalId !== null)
@@ -144,7 +145,7 @@ function execBlock() {
     } catch(e) {
         clearInterval(intervalId);
         intervalId = null;
-        if(DEBUG_LOG_CHECKBOX.checked) download("log.txt", dbg_log);
+        if(DEBUG_LOG_DOWNLOAD) download("log.txt", dbg_log);
         console.error(e);
     }
 }
