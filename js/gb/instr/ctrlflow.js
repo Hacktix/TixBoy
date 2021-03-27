@@ -163,12 +163,12 @@ function _jr_c(compare, cycle) {
                 tmp.push(v);
                 nextfunc = _jr_c.bind(this, compare, 2);
             }
-            console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | read`);
+            //console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | read`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | modify PC`);
+            //console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | modify PC`);
     }
 }
 funcmap[0x30] = _jr_c.bind(this, false);
