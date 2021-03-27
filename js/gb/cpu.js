@@ -1,5 +1,9 @@
 const CLOCK_FREQ = 4194304;
 const BLOCK_SIZE = 5000;
+var CYCLE_COUNT = 0;
+
+// Include instruction mappings
+include('gb/instr/instrs.js');
 
 // CPU Registers
 var registers = {
@@ -69,26 +73,30 @@ var nextfunc = fetchInstruction;
 
 // Function for fetching instructions to execute
 function fetchInstruction() {
-    nextfunc = execInstruction.bind(this, readByte(registers.pc++));
-}
-
-// Function for decoding and executing instructions
-function execInstruction(opcode) {
-    nextfunc = fetchInstruction;
+    let opcode = readByte(registers.pc++);
+    console.log(`  Fetched opcode $${opcode.toString(16).padStart(2, '0')}.`)
+    nextfunc = funcmap[opcode];
 }
 
 // Wrapper for a single next-tick-function call
 function step() {
+    console.log(`* Cycle ${CYCLE_COUNT++}`);
     nextfunc();
 }
 
 // Wrapper called by setInterval() function
 function execBlock() {
-    for(let i = 0; i < BLOCK_SIZE; i++)
-        step();
+    try {
+        for(let i = 0; i < BLOCK_SIZE; i++)
+            step();
+    } catch(e) {
+        clearInterval(intervalId);
+        console.error(`Encountered unknown opcode $${readByte(--registers.pc).toString(16).padStart(2, '0')} at $${registers.pc.toString(16).padStart(4, '0')}`);
+    }
 }
 
 // Function that starts a timer that continuously updates the CPU and all other components
+var intervalId = null;
 async function startCPU() {
-    setInterval(execBlock, (1/CLOCK_FREQ)*1000*BLOCK_SIZE);
+    intervalId = setInterval(execBlock, (1/CLOCK_FREQ)*1000*BLOCK_SIZE);
 }
