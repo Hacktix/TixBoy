@@ -33,6 +33,7 @@ function readIO(addr) {
     // TODO: Implement I/O Registers
     switch(addr) {
         case 0xff0f: return intr_state.if;            // IF
+        case 0xff44: return 0x90;                     // LY
         default:     return 0xff;                     // Unmapped Register
     }
 }
