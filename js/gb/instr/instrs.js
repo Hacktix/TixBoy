@@ -34,3 +34,4 @@ var funcmap = {
 
 include("gb/instr/ld.js");
 include("gb/instr/incdec.js");
+include("gb/instr/ctrlflow.js");

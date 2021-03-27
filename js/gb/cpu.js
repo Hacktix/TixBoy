@@ -37,6 +37,12 @@ var registers = {
     get pc() { return this._pc; },
     get sp() { return this._sp; },
 
+    // Flag Setters (Because im lazy)
+    get flag_z() { return (this._f & 0b10000000) > 0; },
+    get flag_n() { return (this._f & 0b01000000) > 0; },
+    get flag_h() { return (this._f & 0b00100000) > 0; },
+    get flag_c() { return (this._f & 0b00010000) > 0; },
+
     // 8-bit Setters
     set a(v) { this._a = v & 0xff },
     set f(v) { this._f = v & 0xf0 },
