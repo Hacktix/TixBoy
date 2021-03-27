@@ -78,14 +78,14 @@ function writeIO(addr, val) {
 }
 
 function writeByte(addr, val) {
-    if(addr < 0x8000) writeRom(addr, val);           // ROM
-    if(addr < 0xa000) writeVram(addr, val);          // VRAM
-    if(addr < 0xc000) return;                        // SRAM (TODO: Add Support)
-    if(addr < 0xe000) writeWram(addr, val);          // WRAM
-    if(addr < 0xfe00) writeWram(addr - 0x1000, val); // Echo RAM
-    if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
-    if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
-    if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
-    if(addr < 0xffff) hram[addr-0xff80] = val;       // HRAM
-    intr_state.ie = val;                             // IE
+    if(addr < 0x8000) writeRom(addr, val);                // ROM
+    else if(addr < 0xa000) writeVram(addr, val);          // VRAM
+    else if(addr < 0xc000) return;                        // SRAM (TODO: Add Support)
+    else if(addr < 0xe000) writeWram(addr, val);          // WRAM
+    else if(addr < 0xfe00) writeWram(addr - 0x1000, val); // Echo RAM
+    else if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
+    else if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
+    else if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
+    else if(addr < 0xffff) hram[addr-0xff80] = val;       // HRAM
+    else intr_state.ie = val;                             // IE
 }
