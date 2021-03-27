@@ -258,3 +258,33 @@ function _ldh_a_u8(cycle) {
     }
 }
 funcmap[0xf0] = _ldh_a_u8;
+
+
+
+//-------------------------------------------------------------------------------
+// LD (u16), SP
+//-------------------------------------------------------------------------------
+function _ld_u16_sp(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ld_u16_sp.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _ld_u16_sp.bind(this, 2);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | readByte(registers.pc++));
+            nextfunc = _ld_u16_sp.bind(this, 3);
+            break;
+        case 3:
+            writeByte(tmp[0], registers.sp & 0xff);
+            nextfunc = _ld_u16_sp.bind(this, 4);
+            break;
+        case 4:
+            writeByte(tmp.pop() + 1, (registers.sp & 0xff00) >> 8);
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+funcmap[0x08] = _ld_u16_sp;
