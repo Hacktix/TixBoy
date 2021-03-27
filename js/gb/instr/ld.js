@@ -180,3 +180,27 @@ function _ld_u16_a(cycle) {
     }
 }
 funcmap[0xea] = _ld_u16_a;
+
+
+
+//-------------------------------------------------------------------------------
+// LD (FF00+u8), A
+//-------------------------------------------------------------------------------
+function _ldh_u8_a(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ldh_u8_a.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _ldh_u8_a.bind(this, 2);
+            //console.log(`  LD (FF00+u8), a | read u8`);
+            break;
+        case 2:
+            writeByte(0xff00+tmp.pop(), registers.a);
+            nextfunc = fetchInstruction;
+            //console.log(`  LD (FF00+u8), a | write a->(ff00+u8)`);
+            break;
+    }
+}
+funcmap[0xe0] = _ldh_u8_a;
