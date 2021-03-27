@@ -37,7 +37,7 @@ function _xor_mem_hl(cycle) {
         registers.flag_n = registers.flag_h = registers.flag_c = false;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        console.log(`  XOR a, (hl)`);
+        //console.log(`  XOR a, (hl)`);
     }
 }
 for(let i = 0xa8; i < 0xb0; i++) {
