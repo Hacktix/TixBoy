@@ -65,7 +65,7 @@ function _rr_mem_hl(cycle) {
 for(let i = 0x18; i <= 0x1f; i++) {
     if(i === 0x1e) cb_funcmap[i] = _rr_mem_hl;
     else cb_funcmap[i] = ((target) => {
-        let val = readByte(registers.hl);
+        let val = registers[target];
         let cfill = registers.flag_c ? 1 << 7 : 0;
         registers.flag_n = registers.flag_h = false;
         registers.flag_c = (val & 1) > 0;
