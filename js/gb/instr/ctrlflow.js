@@ -76,16 +76,45 @@ function _jr_e8(cycle) {
         case 1:
             tmp.push(e8(readByte(registers.pc++)));
             nextfunc = _jr_e8.bind(this, 2);
-            console.log(`  JR i8 | read i8`);
+            //console.log(`  JR i8 | read i8`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            console.log(`  JR i8 | modify pc`);
+            //console.log(`  JR i8 | modify pc`);
             break;
     }
 }
 funcmap[0x18] = _jr_e8;
+
+
+
+//-------------------------------------------------------------------------------
+// RET
+//-------------------------------------------------------------------------------
+function _ret(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ret.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.sp++));
+            nextfunc = _ret.bind(this, 2);
+            //console.log(`  RET | read (sp++)->lower`);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | (readByte(registers.sp++) << 8));
+            nextfunc = _ret.bind(this, 3);
+            //console.log(`  RET | read (sp++)->upper`);
+            break;
+        case 3:
+            registers.pc = tmp.pop();
+            nextfunc = fetchInstruction;
+            //console.log(`  RET | set pc?`);
+            break;
+    }
+}
+funcmap[0xc9] = _ret;
 
 
 
