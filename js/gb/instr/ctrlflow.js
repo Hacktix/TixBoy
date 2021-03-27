@@ -217,3 +217,53 @@ function _ret_z(compare, cycle) {
 }
 funcmap[0xc0] = _ret_z.bind(this, false);
 funcmap[0xc8] = _ret_z.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// CALL NZ  //  CALL Z
+//-------------------------------------------------------------------------------
+function _call_z(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _call_z.bind(this, compare, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _call_z.bind(this, compare, 2);
+            console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:lower`);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
+            nextfunc = registers.flag_z === compare ? _call_u16.bind(this, 3) : fetchInstruction;
+            console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:upper`);
+            break;
+    }
+}
+funcmap[0xc4] = _call_z.bind(this, false);
+funcmap[0xcc] = _call_z.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// CALL NC  //  CALL C
+//-------------------------------------------------------------------------------
+function _call_c(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _call_c.bind(this, compare, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _call_c.bind(this, compare, 2);
+            console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:lower`);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
+            nextfunc = registers.flag_c === compare ? _call_u16.bind(this, 3) : fetchInstruction;
+            console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:upper`);
+            break;
+    }
+}
+funcmap[0xd4] = _call_c.bind(this, false);
+funcmap[0xdc] = _call_c.bind(this, true);
