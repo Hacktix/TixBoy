@@ -79,7 +79,7 @@ var nextfunc = fetchInstruction;
 function fetchInstruction() {
     let opcode = readByte(registers.pc++);
     console.log(`  Fetched opcode $${opcode.toString(16).padStart(2, '0')}.`)
-    nextfunc = funcmap[opcode];
+    funcmap[opcode]();
 }
 
 // Wrapper for a single next-tick-function call
