@@ -128,6 +128,7 @@ function execBlock() {
     } catch(e) {
         clearInterval(intervalId);
         console.error(`Encountered unknown opcode $${readByte(--registers.pc).toString(16).padStart(2, '0')} at $${registers.pc.toString(16).padStart(4, '0')}`);
+        console.error(e);
     }
 }
 
