@@ -218,12 +218,12 @@ function _ldh_a_u8(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _ldh_a_u8.bind(this, 2);
-            console.log(`  LD a, (FF00+u8) | read u8`);
+            //console.log(`  LD a, (FF00+u8) | read u8`);
             break;
         case 2:
             registers.a = readByte(0xff00+tmp.pop());
             nextfunc = fetchInstruction;
-            console.log(`  LD a, (FF00+u8) | read (ff00+u8)->a`);
+            //console.log(`  LD a, (FF00+u8) | read (ff00+u8)->a`);
             break;
     }
 }
