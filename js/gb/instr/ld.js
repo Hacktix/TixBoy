@@ -194,17 +194,17 @@ function _ld_a_u16(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _ld_a_u16.bind(this, 2);
-            console.log(`  LD a, (u16) | read u16:lower`);
+            //console.log(`  LD a, (u16) | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = _ld_a_u16.bind(this, 3);
-            console.log(`  LD a, (u16) | read u16:upper`);
+            //console.log(`  LD a, (u16) | read u16:upper`);
             break;
         case 3:
             registers.a = readByte(tmp.pop());
             nextfunc = fetchInstruction;
-            console.log(`  LD a, (u16) | (u16)->a`);
+            //console.log(`  LD a, (u16) | (u16)->a`);
             break;
     }
 }

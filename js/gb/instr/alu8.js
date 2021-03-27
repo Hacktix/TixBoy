@@ -42,3 +42,24 @@ function _cp_u8(cycle) {
     }
 }
 funcmap[0xfe] = _cp_u8;
+
+
+
+//-------------------------------------------------------------------------------
+// SUB A, u8
+//-------------------------------------------------------------------------------
+function _sub_u8(cycle) {
+    if(!cycle)
+        nextfunc = _sub_u8.bind(this, 1);
+    else {
+        let cpv = readByte(registers.pc++);
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (((registers.a & 0xf) - (cpv & 0xf)) & 0x10) < 0;
+        registers.flag_c = cpv > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+        console.log(`  SUB a, u8 | read u8`);
+    }
+}
+funcmap[0xd6] = _sub_u8;
