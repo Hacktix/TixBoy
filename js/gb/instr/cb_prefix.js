@@ -74,3 +74,36 @@ for(let i = 0x18; i <= 0x1f; i++) {
         nextfunc = fetchInstruction;
     }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
 }
+
+//-------------------------------------------------------------------------------
+// SWAP r8
+//-------------------------------------------------------------------------------
+function _swap_mem_hl(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _swap_mem_hl.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            nextfunc = _swap_mem_hl.bind(this, 2);
+            break;
+        case 2:
+            let val = tmp.pop();
+            val = ((val & 0xf) << 4) | ((val & 0xf0) >> 4);
+            writeByte(registers.hl, val);
+            registers.flag_c = registers.flag_h = registers.flag_n = false;
+            registers.flag_z = val === 0;
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0x30; i <= 0x37; i++) {
+    if(i === 0x36) cb_funcmap[i] = _swap_mem_hl;
+    else cb_funcmap[i] = ((target) => {
+        registers[target] = ((registers[target] & 0xf) << 4) | ((registers[target] & 0xf0) >> 4);
+        registers.flag_c = registers.flag_h = registers.flag_n = false;
+        registers.flag_z = registers[target] === 0;
+        nextfunc = fetchInstruction;
+        console.log(`  SWAP ${target} ${registers.pc.toString(16)}`)
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
