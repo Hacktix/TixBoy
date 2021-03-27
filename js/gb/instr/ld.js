@@ -151,3 +151,32 @@ function _ld_a_r16(source, cycle) {
 }
 funcmap[0x0a] = _ld_r16_a.bind(this, "bc");
 funcmap[0x1a] = _ld_r16_a.bind(this, "de");
+
+
+
+//-------------------------------------------------------------------------------
+// LD (u16), A
+//-------------------------------------------------------------------------------
+function _ld_u16_a(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ld_u16_a.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _ld_u16_a.bind(this, 2);
+            //console.log(`  LD (u16), a | read u16:lower`);
+            break;
+        case 2:
+            tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
+            nextfunc = _ld_u16_a.bind(this, 3);
+            //console.log(`  LD (u16), a | read u16:upper`);
+            break;
+        case 3:
+            writeByte(tmp.pop(), registers.a);
+            nextfunc = fetchInstruction;
+            //console.log(`  LD (u16), a | a->(u16)`);
+            break;
+    }
+}
+funcmap[0xea] = _ld_u16_a;
