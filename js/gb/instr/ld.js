@@ -81,3 +81,39 @@ function _ld_r8_u8(target, cycle) {
 }
 for(let i = 0x06; i <= 0x3e; i+= 8)
     funcmap[i] = _ld_r8_u8.bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][(i & 0b111000) >> 3]);
+
+
+
+//-------------------------------------------------------------------------------
+// LD (HL+), A  //  LD (HL-), A
+//-------------------------------------------------------------------------------
+function _ld_hlid_a(inc, cycle) {
+    if(!cycle)
+        nextfunc = _ld_hlid_a.bind(this, inc, 1);
+    else {
+        writeByte(registers.hl, registers.a);
+        registers.hl += inc;
+        console.log(`  LD (hl${inc > 0 ? '+' : '-'}), a | write a->(hl${inc > 0 ? '++' : '--'})`)
+        nextfunc = fetchInstruction;
+    }
+}
+funcmap[0x22] = _ld_hlid_a.bind(this, 1);
+funcmap[0x32] = _ld_hlid_a.bind(this, -1);
+
+
+
+//-------------------------------------------------------------------------------
+// LD A, (HL+)  //  LD A, (HL-)
+//-------------------------------------------------------------------------------
+function _ld_a_hlid(inc, cycle) {
+    if(!cycle)
+        nextfunc = _ld_a_hlid.bind(this, inc, 1);
+    else {
+        registers.a = readByte(registers.hl);
+        registers.hl += inc;
+        console.log(`  LD a, (hl${inc > 0 ? '+' : '-'}) | write (hl${inc > 0 ? '++' : '--'})->a`)
+        nextfunc = fetchInstruction;
+    }
+}
+funcmap[0x2a] = _ld_a_hlid.bind(this, 1);
+funcmap[0x3a] = _ld_a_hlid.bind(this, -1);
