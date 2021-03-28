@@ -40,6 +40,78 @@ for(let i = 0x38; i <= 0x3f; i++) {
 }
 
 //-------------------------------------------------------------------------------
+// RLC r8
+//-------------------------------------------------------------------------------
+function _rlc_mem_hl(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _rlc_mem_hl.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            registers.flag_n = registers.flag_h = false;
+            registers.flag_c = (tmp[0] & 0x80) > 0;
+            nextfunc = _rlc_mem_hl.bind(this, 2);
+            break;
+        case 2:
+            let v = tmp.pop();
+            v = (v << 1) | ((v & 0x80) >> 7);
+            registers.flag_z = v === 0;
+            writeByte(registers.hl, v);
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0x00; i < 0x08; i++) {
+    if(i === 0x06) cb_funcmap[i] = _rlc_mem_hl;
+    else cb_funcmap[i] = ((target) => {
+        let v = registers[target];
+        registers.flag_n = registers.flag_h = false;
+        registers.flag_c = (v & 0x80) > 0;
+        v = (v << 1) | ((v & 0x80) >> 7);
+        registers.flag_z = v === 0;
+        registers[target] = v;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
+
+//-------------------------------------------------------------------------------
+// RRC r8
+//-------------------------------------------------------------------------------
+function _rrc_mem_hl(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _rrc_mem_hl.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            registers.flag_n = registers.flag_h = false;
+            registers.flag_c = (tmp[0] & 1) > 0;
+            nextfunc = _rrc_mem_hl.bind(this, 2);
+            break;
+        case 2:
+            let v = tmp.pop();
+            v = (v >> 1) | ((v & 1) << 7);
+            registers.flag_z = v === 0;
+            writeByte(registers.hl, v);
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0x08; i < 0x10; i++) {
+    if(i === 0x0e) cb_funcmap[i] = _rrc_mem_hl;
+    else cb_funcmap[i] = ((target) => {
+        let v = registers[target];
+        registers.flag_n = registers.flag_h = false;
+        registers.flag_c = (v & 1) > 0;
+        v = (v >> 1) | ((v & 1) << 7);
+        registers.flag_z = v === 0;
+        registers[target] = v;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
+
+//-------------------------------------------------------------------------------
 // RR r8
 //-------------------------------------------------------------------------------
 function _rr_mem_hl(cycle) {
