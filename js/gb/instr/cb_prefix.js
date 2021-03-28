@@ -107,3 +107,29 @@ for(let i = 0x30; i <= 0x37; i++) {
         //console.log(`  SWAP ${target}`)
     }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
 }
+
+//-------------------------------------------------------------------------------
+// BIT u3, r8
+//-------------------------------------------------------------------------------
+function _bit_mem_hl(bit, cycle) {
+    if(!cycle)
+        nextfunc = _bit_mem_hl.bind(this, bit, 1);
+    else {
+        registers.flag_n = false;
+        registers.flag_h = true;
+        registers.flag_z = (readByte(registers.hl) & (1 << bit)) === 0;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x40; i < 0x80; i++) {
+    let src = ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111];
+    if(src === "(hl)")
+        cb_funcmap[i] = _bit_mem_hl.bind(this, (i&0b111000) >> 3);
+    else
+        cb_funcmap[i] = ((bit, target)=>{
+            registers.flag_n = false;
+            registers.flag_h = true;
+            registers.flag_z = (registers[target] & (1 << bit)) === 0;
+            nextfunc = fetchInstruction;
+        }).bind(this, (i&0b111000) >> 3, src);
+}
