@@ -32,12 +32,27 @@ var readWram = function(addr) {
 function readIO(addr) {
     // TODO: Implement I/O Registers
     switch(addr) {
+        // Timer Registers
         case 0xff04: return timer_state.div;          // DIV
         case 0xff05: return timer_state.tima;         // TIMA
         case 0xff06: return timer_state.tma;          // TMA
         case 0xff07: return timer_state.tac;          // TAC
+
         case 0xff0f: return intr_state.if;            // IF
-        case 0xff44: return 0x90;                     // LY
+
+        // PPU Registers
+        case 0xff40: return ppu_state.lcdc;           // LCDC
+        case 0xff41: return ppu_state.stat;           // STAT
+        case 0xff42: return ppu_state.scy;            // SCY
+        case 0xff43: return ppu_state.scx;            // SCX
+        case 0xff44: return ppu_state.ly;             // LY
+        case 0xff45: return ppu_state.lyc;            // LYC
+        case 0xff47: return ppu_state.bgp;            // BGP
+        case 0xff48: return ppu_state.obp0;           // OBP0
+        case 0xff49: return ppu_state.obp1;           // OBP1
+        case 0xff4a: return ppu_state.wy;             // WY
+        case 0xff4b: return ppu_state.wx;             // WX
+
         default:     return 0xff;                     // Unmapped Register
     }
 }
@@ -79,21 +94,23 @@ function writeIO(addr, val) {
         case 0xff01:
             document.getElementById("dbgout").innerHTML += String.fromCharCode(val).replace("\n", "<br>");
             break;
-        case 0xff04:                                 // DIV
-            timer_state.div = val;                   // This doesn't actually set the DIV value thanks to the setter function
-            break;
-        case 0xff05:                                 // TIMA
-            timer_state.tima = val;
-            break;
-        case 0xff06:                                 // TMA
-            timer_state.tma = val;
-            break;
-        case 0xff07:                                 // TAC
-            timer_state.tac = val;
-            break;
-        case 0xff0f:                                 // IF
-            intr_state.if = val;
-            break;
+        case 0xff04: timer_state.div = val; break;         // DIV
+        case 0xff05: timer_state.tima = val; break;        // TIMA
+        case 0xff06: timer_state.tma = val; break;         // TMA
+        case 0xff07: timer_state.tac = val; break;         // TAC
+        case 0xff0f: intr_state.if = val; break;           // IF
+
+        // PPU Registers
+        case 0xff40: ppu_state.lcdc = val; break;          // LCDC
+        case 0xff41: ppu_state.stat = val; break;          // STAT
+        case 0xff42: ppu_state.scy = val; break;           // SCY
+        case 0xff43: ppu_state.scx = val; break;           // SCX
+        case 0xff45: ppu_state.lyc = val; break;           // LYC
+        case 0xff47: ppu_state.bgp = val; break;           // BGP
+        case 0xff48: ppu_state.obp0 = val; break;          // OBP0
+        case 0xff49: ppu_state.obp1 = val; break;          // OBP1
+        case 0xff4a: ppu_state.wy = val; break;            // WY
+        case 0xff4b: ppu_state.wx = val; break;            // WX
     }
 }
 

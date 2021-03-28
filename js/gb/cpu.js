@@ -10,6 +10,7 @@ const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
 include('gb/instr/instrs.js');     // Instruction Mappings
 include('gb/interrupts.js');       // Interrupt Handling
 include('gb/timers.js');           // Hardware Timers
+include('gb/ppu.js');              // PPU
 
 // Debug breakpoints cause CPU bad
 var debug_brk = [];
@@ -168,6 +169,7 @@ function step() {
     //console.log(`* Cycle ${CYCLE_COUNT++} (PC: $${registers.pc.toString(16).padStart(4, '0')})`);
     nextfunc();
     tickTimers();
+    updatePPU();
 }
 
 // Wrapper called by setInterval() function
