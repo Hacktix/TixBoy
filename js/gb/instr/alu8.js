@@ -27,6 +27,35 @@ for(let i = 0xb0; i < 0xb8; i++) {
 
 
 //-------------------------------------------------------------------------------
+// AND A, r8
+//-------------------------------------------------------------------------------
+function _and_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _and_mem_hl.bind(this, 1);
+    else {
+        registers.a &= readByte(registers.hl);
+        registers.flag_n = registers.flag_c = false;
+        registers.flag_h = true;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0xa0; i < 0xa8; i++) {
+    if(i === 0xa6)
+        funcmap[i] = _and_mem_hl;
+    else
+        funcmap[i] = ((source) => {
+            registers.a &= registers[source];
+            registers.flag_n = registers.flag_c = false;
+            registers.flag_h = true;
+            registers.flag_z = registers.a === 0;
+            nextfunc = fetchInstruction;
+        }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
+}
+
+
+
+//-------------------------------------------------------------------------------
 // ADD A, r8
 //-------------------------------------------------------------------------------
 function _add_mem_hl(cycle) {
