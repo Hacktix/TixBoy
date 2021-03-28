@@ -91,9 +91,6 @@ var writeWram = function(addr, val) {
 function writeIO(addr, val) {
     // TODO: Implement I/O Registers
     switch(addr) {
-        case 0xff01:
-            document.getElementById("dbgout").innerHTML += String.fromCharCode(val).replace("\n", "<br>");
-            break;
         case 0xff04: timer_state.div = val; break;         // DIV
         case 0xff05: timer_state.tima = val; break;        // TIMA
         case 0xff06: timer_state.tma = val; break;         // TMA
