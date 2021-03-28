@@ -116,7 +116,7 @@ function tickPPU() {
             if(ppu_state._bg_fifo.length) {
                 // Shift out pixel
                 let px = ppu_state._bg_fifo.shift();
-                let color = Math.floor((3 - px.color) * (256/4));
+                let color = (3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*64;
                 drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
                 
                 // Check if HBlank should be entered
