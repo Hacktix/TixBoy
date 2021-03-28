@@ -43,7 +43,7 @@ function readByte(addr) {
     if(addr < 0xa000) return readVram(addr);          // VRAM
     if(addr < 0xc000) return 0xff;                    // SRAM (TODO: Add Support)
     if(addr < 0xe000) return readWram(addr);          // WRAM
-    if(addr < 0xfe00) return readWram(addr - 0x1000); // Echo RAM
+    if(addr < 0xfe00) return readWram(addr - 0x2000); // Echo RAM
     if(addr < 0xfea0) return oam[addr-0xfe00];        // OAM
     if(addr < 0xfeff) return 0xff;                    // "Not Usable" (TODO: Implement model-specific behavior)
     if(addr < 0xff80) return readIO(addr);            // I/O Registers
@@ -86,7 +86,7 @@ function writeByte(addr, val) {
     else if(addr < 0xa000) writeVram(addr, val);          // VRAM
     else if(addr < 0xc000) return;                        // SRAM (TODO: Add Support)
     else if(addr < 0xe000) writeWram(addr, val);          // WRAM
-    else if(addr < 0xfe00) writeWram(addr - 0x1000, val); // Echo RAM
+    else if(addr < 0xfe00) writeWram(addr - 0x2000, val); // Echo RAM
     else if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
     else if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
     else if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
