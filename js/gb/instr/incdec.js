@@ -6,18 +6,18 @@ function _inc_mem_hl(cycle=0) {
         default:
             nextfunc = _inc_mem_hl.bind(this, cycle+1);
             break;
-        case 2:
+        case 1:
             tmp.push(readByte(registers.hl));
-            nextfunc = _inc_mem_hl.bind(this, 3);
-            //console.log(`  INC (hl) | read (hl)`);
-        case 3:
+            nextfunc = _inc_mem_hl.bind(this, 2);
+            break;
+        case 2:
             registers.flag_h = (tmp[0] & 0xf) === 0xf;
             let v = (tmp.pop() + 1) & 0xff;
             registers.flag_z = v === 0;
             registers.flag_n = false;
             writeByte(registers.hl, v);
             nextfunc = fetchInstruction
-            //console.log(`  INC (hl) | write (hl)`);
+            break;
     }
 }
 for(let i = 0x04; i <= 0x3c; i += 0x08) {
@@ -39,22 +39,24 @@ for(let i = 0x04; i <= 0x3c; i += 0x08) {
 // DEC r8
 //-------------------------------------------------------------------------------
 function _dec_mem_hl(cycle=0) {
+
+    console.log("dec (hl)")
     switch(cycle) {
         default:
             nextfunc = _dec_mem_hl.bind(this, cycle+1);
             break;
-        case 2:
+        case 1:
             tmp.push(readByte(registers.hl));
-            nextfunc = _dec_mem_hl.bind(this, 3);
-            //console.log(`  DEC (hl) | read (hl)`);
-        case 3:
+            nextfunc = _dec_mem_hl.bind(this, 2);
+            break;
+        case 2:
             registers.flag_h = (tmp[0] & 0xf) === 0;
             let v = (tmp.pop() - 1) & 0xff;
             registers.flag_z = v === 0;
             registers.flag_n = true;
             writeByte(registers.hl, v);
             nextfunc = fetchInstruction
-            //console.log(`  DEC (hl) | write (hl)`);
+            break;
     }
 }
 for(let i = 0x05; i <= 0x3d; i += 0x08) {
