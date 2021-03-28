@@ -262,6 +262,23 @@ funcmap[0xe6] = _and_u8;
 
 
 //-------------------------------------------------------------------------------
+// OR A, u8
+//-------------------------------------------------------------------------------
+function _or_u8(cycle) {
+    if(!cycle)
+        nextfunc = _or_u8.bind(this, 1);
+    else {
+        registers.a |= readByte(registers.pc++);
+        registers.flag_n = registers.flag_c = registers.flag_h = false;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+    }
+}
+funcmap[0xf6] = _or_u8;
+
+
+
+//-------------------------------------------------------------------------------
 // XOR A, u8
 //-------------------------------------------------------------------------------
 function _xor_u8(cycle) {
