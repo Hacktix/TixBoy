@@ -1,7 +1,7 @@
 const CLOCK_FREQ = 4194304;
 const BLOCK_SIZE = 5000;
 const DEBUG_LOG_DOWNLOAD = false;
-const DEBUG_LOG_LEN_LIMIT = 287416;
+const DEBUG_LOG_LEN_LIMIT = 0;
 var CYCLE_COUNT = 0;
 
 const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
@@ -122,7 +122,7 @@ function fetchInstruction() {
     // Debug Logging
     if(DEBUG_LOG_DOWNLOAD)
         dbg_log.push(`A: ${registers.a.toString(16).padStart(2, '0')} F: ${registers.f.toString(16).padStart(2, '0')} B: ${registers.b.toString(16).padStart(2, '0')} C: ${registers.c.toString(16).padStart(2, '0')} D: ${registers.d.toString(16).padStart(2, '0')} E: ${registers.e.toString(16).padStart(2, '0')} H: ${registers.h.toString(16).padStart(2, '0')} L: ${registers.l.toString(16).padStart(2, '0')} SP: ${registers.sp.toString(16).padStart(4, '0')} PC: 00:${registers.pc.toString(16).padStart(4, '0')} (${readByte(registers.pc).toString(16).padStart(2, '0')} ${readByte(registers.pc+1).toString(16).padStart(2, '0')} ${readByte(registers.pc+2).toString(16).padStart(2, '0')} ${readByte(registers.pc+3).toString(16).padStart(2, '0')})`.toUpperCase());
-    if(dbg_log.length === DEBUG_LOG_LEN_LIMIT)
+    if(DEBUG_LOG_LEN_LIMIT > 0 && dbg_log.length === DEBUG_LOG_LEN_LIMIT)
         throw "Log length limit reached."
 
     if(debug_brk.includes(registers.pc) && intervalId !== null)
