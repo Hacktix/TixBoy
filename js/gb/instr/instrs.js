@@ -11,10 +11,26 @@ var funcmap = {
         //console.log(`  DI`);
     },
 
+    // EI
     0xfb: () => {
         intr_state.ime_queue = true;
         nextfunc = fetchInstruction;
-    }
+    },
+
+    // DAA
+    0x27: () => {
+        let cor = 0;
+        let sc = false;
+        if(registers.flag_h || (!registers.flag_n && (registers.a & 0xf) > 9)) cor |= 0x6;
+        if(registers.flag_c || (!registers.flag_n && registers.a > 0x99)) {
+            cor |= 0x60;
+            sc = true;
+        }
+        registers.a += registers.flag_n ? -cor : cor;
+        registers.flag_z = registers.a === 0;
+        registers.flag_c = sc;
+        registers.flag_h = false;
+    },
 };
 
 //-------------------------------------------------------------------------------
