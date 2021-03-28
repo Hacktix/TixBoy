@@ -78,7 +78,7 @@ function _jp_z(compare, cycle) {
             nextfunc = _jp_z.bind(this, compare, 2);
             break;
         case 2:
-            tmp.push((readByte(registers.pc) << 8) + tmp.pop());
+            tmp.push((readByte(registers.pc++) << 8) + tmp.pop());
             if(registers.flag_z === compare)
                 nextfunc = _jp_z.bind(this, compare, 3);
             else {
