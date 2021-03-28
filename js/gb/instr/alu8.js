@@ -98,7 +98,7 @@ function _adc_mem_hl(cycle) {
         let addv = (readByte(registers.hl) + registers.flag_c) & 0xff;
         registers.flag_n = false;
         registers.flag_h = (registers.a & 0xf) + (readByte(registers.hl) & 0xf) + registers.flag_c > 0xf;
-        registers.flag_c = registers.a + (readByte(registers.hl) & 0xf) + registers.flag_c > 0xff;
+        registers.flag_c = registers.a + readByte(registers.hl) + registers.flag_c > 0xff;
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
@@ -218,7 +218,7 @@ for(let i = 0x98; i < 0xa0; i++) {
 //-------------------------------------------------------------------------------
 function _cp_mem_hl(cycle) {
     if(!cycle)
-        nextfunc = _cp_u8.bind(this, 1);
+        nextfunc = _cp_mem_hl.bind(this, 1);
     else {
         let cpv = readByte(registers.hl);
         registers.flag_z = registers.a === cpv;
