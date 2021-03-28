@@ -9,6 +9,7 @@ const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
 // Include other relevant things
 include('gb/instr/instrs.js');     // Instruction Mappings
 include('gb/interrupts.js');       // Interrupt Handling
+include('gb/timers.js');           // Hardware Timers
 
 // Debug breakpoints cause CPU bad
 var debug_brk = [];
@@ -150,6 +151,7 @@ function fetchInstruction() {
 function step() {
     //console.log(`* Cycle ${CYCLE_COUNT++} (PC: $${registers.pc.toString(16).padStart(4, '0')})`);
     nextfunc();
+    tickTimers();
 }
 
 // Wrapper called by setInterval() function

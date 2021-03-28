@@ -32,6 +32,10 @@ var readWram = function(addr) {
 function readIO(addr) {
     // TODO: Implement I/O Registers
     switch(addr) {
+        case 0xff04: return timer_state.div;          // DIV
+        case 0xff05: return timer_state.tima;         // TIMA
+        case 0xff06: return timer_state.tma;          // TMA
+        case 0xff07: return timer_state.tac;          // TAC
         case 0xff0f: return intr_state.if;            // IF
         case 0xff44: return 0x90;                     // LY
         default:     return 0xff;                     // Unmapped Register
@@ -74,6 +78,18 @@ function writeIO(addr, val) {
     switch(addr) {
         case 0xff01:
             document.getElementById("dbgout").innerHTML += String.fromCharCode(val).replace("\n", "<br>");
+            break;
+        case 0xff04:                                 // DIV
+            timer_state.div = val;                   // This doesn't actually set the DIV value thanks to the setter function
+            break;
+        case 0xff05:                                 // TIMA
+            timer_state.tima = val;
+            break;
+        case 0xff06:                                 // TMA
+            timer_state.tma = val;
+            break;
+        case 0xff07:                                 // TAC
+            timer_state.tac = val;
             break;
         case 0xff0f:                                 // IF
             intr_state.if = val;
