@@ -98,6 +98,38 @@ funcmap[0xca] = _jp_z.bind(this, true);
 
 
 //-------------------------------------------------------------------------------
+// JP NC, u16  //  JP C, u16
+//-------------------------------------------------------------------------------
+function _jp_c(compare, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _jp_c.bind(this, compare, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.pc++));
+            nextfunc = _jp_c.bind(this, compare, 2);
+            break;
+        case 2:
+            tmp.push((readByte(registers.pc++) << 8) + tmp.pop());
+            if(registers.flag_c === compare)
+                nextfunc = _jp_c.bind(this, compare, 3);
+            else {
+                tmp.pop();
+                nextfunc = fetchInstruction;
+            }
+            break;
+        case 3:
+            registers.pc = tmp.pop();
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+funcmap[0xd2] = _jp_c.bind(this, false);
+funcmap[0xda] = _jp_c.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
 // JP HL
 //-------------------------------------------------------------------------------
 funcmap[0xe9] = () => { registers.pc = registers.hl; };
