@@ -344,11 +344,12 @@ function _sbc_u8(cycle) {
     if(!cycle)
         nextfunc = _sbc_u8.bind(this, 1);
     else {
-        let cpv = (readByte(registers.pc++) + registers.flag_c) & 0xff;
+        let bv = readByte(registers.pc++);
+        let cpv = (bv + registers.flag_c) & 0xff;
         registers.flag_z = registers.a === cpv;
         registers.flag_n = true;
-        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
-        registers.flag_c = cpv > registers.a;
+        registers.flag_h = (bv & 0xf) + registers.flag_c > (registers.a & 0xf)
+        registers.flag_c = bv + registers.flag_c > registers.a;
         registers.a -= cpv;
         nextfunc = fetchInstruction;
         // console.log(`  SUB a, u8 | read u8`);
