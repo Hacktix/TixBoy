@@ -133,3 +133,38 @@ for(let i = 0x40; i < 0x80; i++) {
             nextfunc = fetchInstruction;
         }).bind(this, (i&0b111000) >> 3, src);
 }
+
+//-------------------------------------------------------------------------------
+// SLA r8
+//-------------------------------------------------------------------------------
+function _sla_mem_hl(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _sla_mem_hl.bind(this, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            nextfunc = _sla_mem_hl.bind(this, 2);
+            break;
+        case 2:
+            let v = tmp.pop();
+            registers.flag_c = (v & 0b10000000) > 0;
+            registers.flag_n = registers.flag_h = false;
+            v = (v << 1) & 0xff;
+            registers.flag_z = v === 0;
+            writeByte(registers.hl, v);
+            nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x20; i < 0x28; i++) {
+    if(i === 0x26) cb_funcmap[i] = _sla_mem_hl;
+    else cb_funcmap[i] = ((target) => {
+        let v = registers[target];
+        registers.flag_c = (v & 0b10000000) > 0;
+        registers.flag_n = registers.flag_h = false;
+        v = (v << 1) & 0xff;
+        registers.flag_z = v === 0;
+        registers[target] = v;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
