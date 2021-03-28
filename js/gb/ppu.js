@@ -139,6 +139,8 @@ function tickPPU() {
             if(++ppu_state._cycle === 114) {
                 ppu_state._cycle = 0;
                 ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
+                if(ppu_state._mode === 1)
+                    intr_state.if |= 1;
             }
             break;
 
