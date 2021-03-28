@@ -70,10 +70,13 @@ function tickPPU() {
             switch(ppu_state._fetcher_state++) {
                 case 0:
                     // Fetching tile number
-                    let addr0 = 
-                        (ppu_state._fetcher_win ? ((ppu_state.lcdc & 0b1000000) ? 0x1c00 : 0x1800) : ((ppu_state.lcdc & 0b1000) ? 0x1c00 : 0x1800)) // Tilemap Base Address
-                        + (32 * Math.floor(ppu_state.ly/8))                                                                                         // LY Offset
-                        + ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f)                                                           // X-Offset
+                    let b_addr0 = (ppu_state._fetcher_win ? ((ppu_state.lcdc & 0b1000000) ? 0x1c00 : 0x1800) : ((ppu_state.lcdc & 0b1000) ? 0x1c00 : 0x1800))
+                    let addr_offset0 = 
+                        + (32 * Math.floor(ppu_state.ly/8))                                        // LY Offset
+                        + (32*Math.floor(ppu_state.scy / 8))                                       // SCY Offset
+                        + (Math.floor(ppu_state.scx / 8))                                          // SCX Offset
+                        + ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f)          // X-Offset
+                    let addr0 = b_addr0 + (addr_offset0 & 0x3ff);
                     ppu_state._fetcher_tileno = vram[addr0];
                     break;
                 case 1:
