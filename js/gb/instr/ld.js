@@ -224,12 +224,10 @@ function _ldh_u8_a(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _ldh_u8_a.bind(this, 2);
-            //console.log(`  LD (FF00+u8), a | read u8`);
             break;
         case 2:
             writeByte(0xff00+tmp.pop(), registers.a);
             nextfunc = fetchInstruction;
-            //console.log(`  LD (FF00+u8), a | write a->(ff00+u8)`);
             break;
     }
 }
@@ -248,16 +246,50 @@ function _ldh_a_u8(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _ldh_a_u8.bind(this, 2);
-            //console.log(`  LD a, (FF00+u8) | read u8`);
             break;
         case 2:
-            registers.a = readByte(0xff00+tmp.pop());
+            registers.a = readByte(0xff00+tmp.pop()); 
             nextfunc = fetchInstruction;
-            //console.log(`  LD a, (FF00+u8) | read (ff00+u8)->a`);
             break;
     }
 }
 funcmap[0xf0] = _ldh_a_u8;
+
+
+
+//-------------------------------------------------------------------------------
+// LD (FF00+c), A
+//-------------------------------------------------------------------------------
+function _ldh_c_a(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ldh_c_a.bind(this, 1);
+            break;
+        case 1:
+            writeByte(0xff00+registers.c, registers.a);
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+funcmap[0xe2] = _ldh_c_a;
+
+
+
+//-------------------------------------------------------------------------------
+// LD A, (FF00+c)
+//-------------------------------------------------------------------------------
+function _ldh_a_c(cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _ldh_a_c.bind(this, 1);
+            break;
+        case 1:
+            registers.a = readByte(0xff00+registers.c);
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+funcmap[0xf2] = _ldh_a_c;
 
 
 
