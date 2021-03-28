@@ -50,8 +50,6 @@ function updatePPU() {
     }
 }
 
-var logged = false;
-
 function tickPPU() {
     switch(ppu_state._mode) {
         case 2:
@@ -77,29 +75,23 @@ function tickPPU() {
                         + (32 * Math.floor(ppu_state.ly/8))                                                                                         // LY Offset
                         + ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f)                                                           // X-Offset
                     ppu_state._fetcher_tileno = vram[addr0];
-                    if(ppu_state._fetcher_x === 9 && ppu_state.ly === 16 && !logged)
-                        console.log(`Fetched tile no. $${ppu_state._fetcher_tileno.toString(16).padStart(2, '0')} from $${addr0.toString(16).padStart(4, '0')}`);
                     break;
                 case 1:
                     // Fetching tile data low
                     let addr1 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
-                        + ((ppu_state.lcdc & 0b10000) === 0 ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno))) // Tile No. Offset
+                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
                         + (2*Math.floor(ppu_state.ly % 8))                                                                             // Pixel-based Line Offset
                     ppu_state._fetcher_data_lo = vram[addr1];
-                    if(ppu_state._fetcher_x === 9 && ppu_state.ly === 16 && !logged)
-                        console.log(`Fetched tile data low $${ppu_state._fetcher_data_lo.toString(16).padStart(2, '0')} from $${addr1.toString(16).padStart(4, '0')}`);
                     break;
                 case 2:
                     let addr2 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
-                        + ((ppu_state.lcdc & 0b10000) === 0 ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno))) // Tile No. Offset
+                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
                         + (2*Math.floor(ppu_state.ly % 8))                                                                             // Pixel-based Line Offset
                         + 1                                                                                                            // High Byte Offset
                     // Fetching tile data high
                     ppu_state._fetcher_data_hi = vram[addr2];
-                    if(ppu_state._fetcher_x === 9 && ppu_state.ly === 16 && !logged)
-                        console.log(`Fetched tile data high $${ppu_state._fetcher_data_hi.toString(16).padStart(2, '0')} from $${addr2.toString(16).padStart(4, '0')}`);
                     break;
                 case 3:
                     break;
@@ -153,7 +145,6 @@ function tickPPU() {
                     ppu_state._mode = 2;
                 }
             }
-            logged = true;
             break;
     }
 }
