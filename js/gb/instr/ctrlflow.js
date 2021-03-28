@@ -363,3 +363,30 @@ function _call_c(compare, cycle) {
 }
 funcmap[0xd4] = _call_c.bind(this, false);
 funcmap[0xdc] = _call_c.bind(this, true);
+
+
+
+//-------------------------------------------------------------------------------
+// RST vec
+//-------------------------------------------------------------------------------
+function _rst(vec, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _rst.bind(this, vec, 1);
+            break;
+        case 1:
+            nextfunc = _rst.bind(this, vec, 2);
+            break;
+        case 2:
+            writeByte(--registers.sp, (registers.pc & 0xff00) >> 8);
+            nextfunc = _rst.bind(this, vec, 3);
+            break;
+        case 3:
+            writeByte(--registers.sp, registers.pc & 0xff);
+            registers.pc = vec;
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0xc7; i <= 0xff; i += 0x08)
+    funcmap[i] = _rst.bind(this, i&0b111000);
