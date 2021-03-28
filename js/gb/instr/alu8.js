@@ -27,6 +27,39 @@ for(let i = 0xb0; i < 0xb8; i++) {
 
 
 //-------------------------------------------------------------------------------
+// ADC A, r8
+//-------------------------------------------------------------------------------
+function _adc_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _adc_mem_hl.bind(this, 1);
+    else {
+        let addv = (readByte(registers.hl) + registers.flag_c) & 0xff;
+        registers.flag_n = false;
+        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+        registers.flag_c = registers.a + addv > 0xff;
+        registers.a += addv;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x88; i < 0x90; i++) {
+    if(i === 0x8e)
+        funcmap[i] = _adc_mem_hl;
+    else
+        funcmap[i] = ((source) => {
+            let addv = (registers[source] + registers.flag_c) & 0xff;
+            registers.flag_n = false;
+            registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+            registers.flag_c = registers.a + addv > 0xff;
+            registers.a += addv;
+            registers.flag_z = registers.a === 0;
+            nextfunc = fetchInstruction;
+        }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
+}
+
+
+
+//-------------------------------------------------------------------------------
 // XOR A, r8
 //-------------------------------------------------------------------------------
 function _xor_mem_hl(cycle) {
