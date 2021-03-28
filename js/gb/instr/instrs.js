@@ -13,7 +13,7 @@ var funcmap = {
 
     // EI
     0xfb: () => {
-        intr_state.ime_queue = true;
+        intr_state.ime_queue = 2;
         nextfunc = fetchInstruction;
     },
 

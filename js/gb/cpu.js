@@ -6,8 +6,9 @@ var CYCLE_COUNT = 0;
 
 const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
 
-// Include instruction mappings
-include('gb/instr/instrs.js');
+// Include other relevant things
+include('gb/instr/instrs.js');     // Instruction Mappings
+include('gb/interrupts.js');       // Interrupt Handling
 
 // Debug breakpoints cause CPU bad
 var debug_brk = [];
@@ -103,14 +104,6 @@ var registers = {
     },
 };
 
-// Interrupt-related CPU variables
-var intr_state = {
-    if: 0,
-    ie: 0,
-    ime: false,
-    ime_queue: false,
-};
-
 // Function pointer showing what to do on the next tick
 var nextfunc = fetchInstruction;
 
@@ -119,14 +112,34 @@ var dbg_log = [];
 
 // Function for fetching instructions to execute
 function fetchInstruction() {
+    // Handle IME Enable Queuing
+    if(intr_state.ime_queue > 0 && --intr_state.ime_queue === 0)
+        intr_state.ime = true;
+
+    // Handle Interrupts
+    if(intr_state.ime && (intr_state.if & intr_state.ie) !== 0) {
+        let vec = 0x40;
+        let bmp = 1;
+        while((intr_state.if & bmp) === 0) {
+            bmp <<= 1;
+            vec += 0x8;
+        }
+        intr_state.if &= ~bmp;
+        nextfunc = handleInterrupt.bind(this, vec, 1);
+        return;
+    }
+
     // Debug Logging
     if(DEBUG_LOG_DOWNLOAD)
         dbg_log.push(`A: ${registers.a.toString(16).padStart(2, '0')} F: ${registers.f.toString(16).padStart(2, '0')} B: ${registers.b.toString(16).padStart(2, '0')} C: ${registers.c.toString(16).padStart(2, '0')} D: ${registers.d.toString(16).padStart(2, '0')} E: ${registers.e.toString(16).padStart(2, '0')} H: ${registers.h.toString(16).padStart(2, '0')} L: ${registers.l.toString(16).padStart(2, '0')} SP: ${registers.sp.toString(16).padStart(4, '0')} PC: 00:${registers.pc.toString(16).padStart(4, '0')} (${readByte(registers.pc).toString(16).padStart(2, '0')} ${readByte(registers.pc+1).toString(16).padStart(2, '0')} ${readByte(registers.pc+2).toString(16).padStart(2, '0')} ${readByte(registers.pc+3).toString(16).padStart(2, '0')})`.toUpperCase());
     if(DEBUG_LOG_LEN_LIMIT > 0 && dbg_log.length === DEBUG_LOG_LEN_LIMIT)
         throw "Log length limit reached."
 
+    // Breakpoints
     if(debug_brk.includes(registers.pc) && intervalId !== null)
         throw `Breakpoint hit: $${registers.pc.toString(16).padStart(4, '0')}`;
+
+    // Decode & Run Opcode
     let opcode = readByte(registers.pc++);
     if(funcmap[opcode] === undefined)
         throw `Encountered unknown opcode $${opcode.toString(16).padStart(2, '0')} at $${(registers.pc-1).toString(16).padStart(4, '0')}`;
