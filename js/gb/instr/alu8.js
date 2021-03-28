@@ -121,6 +121,70 @@ for(let i = 0xa8; i < 0xb0; i++) {
 
 
 //-------------------------------------------------------------------------------
+// SUB A, r8
+//-------------------------------------------------------------------------------
+function _sub_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _sub_mem_hl.bind(this, 1);
+    else {
+        let cpv = readByte(registers.hl);
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
+        registers.flag_c = cpv > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x90; i < 0x98; i++) {
+    if(i === 0x96) funcmap[i] = _sub_mem_hl;
+    else funcmap[i] = ((source) => {
+        let cpv = registers[source];
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
+        registers.flag_c = cpv > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
+
+
+
+//-------------------------------------------------------------------------------
+// SBC A, r8
+//-------------------------------------------------------------------------------
+function _sbc_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _sbc_mem_hl.bind(this, 1);
+    else {
+        let bv = readByte(registers.hl);
+        let cpv = (bv + registers.flag_c) & 0xff;
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (bv & 0xf) + registers.flag_c > (registers.a & 0xf)
+        registers.flag_c = bv + registers.flag_c > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+        // console.log(`  SUB a, u8 | read u8`);
+    }
+}
+for(let i = 0x98; i < 0xa0; i++) {
+    if(i === 0x9e) funcmap[i] = _sbc_mem_hl;
+    else funcmap[i] = ((source) => {
+        let cpv = (registers[source] + registers.flag_c) & 0xff;
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (registers[source] & 0xf) + registers.flag_c > (registers.a & 0xf)
+        registers.flag_c = registers[source] + registers.flag_c > registers.a;
+        registers.a -= cpv;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
+
+
+
+//-------------------------------------------------------------------------------
 // CP A, r8
 //-------------------------------------------------------------------------------
 function _cp_mem_hl(cycle) {
