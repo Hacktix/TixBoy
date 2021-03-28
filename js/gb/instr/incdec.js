@@ -39,8 +39,6 @@ for(let i = 0x04; i <= 0x3c; i += 0x08) {
 // DEC r8
 //-------------------------------------------------------------------------------
 function _dec_mem_hl(cycle=0) {
-
-    console.log("dec (hl)")
     switch(cycle) {
         default:
             nextfunc = _dec_mem_hl.bind(this, cycle+1);
