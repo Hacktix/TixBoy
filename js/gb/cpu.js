@@ -105,6 +105,11 @@ var registers = {
     },
 };
 
+// Boolean flags related to HALT mode
+var cpu_halted = false;
+var skip_interrupt = false;
+var halt_bug = false;
+
 // Function pointer showing what to do on the next tick
 var nextfunc = fetchInstruction;
 
@@ -118,17 +123,24 @@ function fetchInstruction() {
         intr_state.ime = true;
 
     // Handle Interrupts
-    if(intr_state.ime && (intr_state.if & intr_state.ie) !== 0) {
-        let vec = 0x40;
-        let bmp = 1;
-        while((intr_state.if & bmp) === 0) {
-            bmp <<= 1;
-            vec += 0x8;
+    if((skip_interrupt || intr_state.ime) && (intr_state.if & intr_state.ie) !== 0) {
+        if(intr_state.ime) {
+            let vec = 0x40;
+            let bmp = 1;
+            while((intr_state.if & bmp) === 0) {
+                bmp <<= 1;
+                vec += 0x8;
+            }
+            intr_state.if &= ~bmp;
+            nextfunc = handleInterrupt.bind(this, vec, cpu_halted ? 0 : 1);
+            return;
         }
-        intr_state.if &= ~bmp;
-        nextfunc = handleInterrupt.bind(this, vec, 1);
-        return;
+        skip_interrupt = cpu_halted = false;
     }
+
+    // Check HALT State
+    if(cpu_halted)
+        return;
 
     // Debug Logging
     if(DEBUG_LOG_DOWNLOAD)
@@ -142,6 +154,10 @@ function fetchInstruction() {
 
     // Decode & Run Opcode
     let opcode = readByte(registers.pc++);
+    if(halt_bug) {
+        halt_bug = false;
+        registers.pc--;
+    }
     if(funcmap[opcode] === undefined)
         throw `Encountered unknown opcode $${opcode.toString(16).padStart(2, '0')} at $${(registers.pc-1).toString(16).padStart(4, '0')}`;
     funcmap[opcode]();

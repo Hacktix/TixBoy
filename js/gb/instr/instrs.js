@@ -17,6 +17,16 @@ var funcmap = {
         nextfunc = fetchInstruction;
     },
 
+    // HALT
+    0x76: () => {
+        if(intr_state.ime) cpu_halted = true;
+        else {
+            if((intr_state.ie & intr_state.if) === 0) skip_interrupt = cpu_halted = true;
+            else halt_bug = true;
+        }
+        nextfunc = fetchInstruction;
+    },
+
     // DAA
     0x27: () => {
         let cor = 0;

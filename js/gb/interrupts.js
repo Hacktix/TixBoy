@@ -15,6 +15,7 @@ var intr_state = {
 function handleInterrupt(vec, cycle) {
     switch(cycle) {
         case 0:
+            cpu_halted = false;
         case 1:
         case 2:
             nextfunc = handleInterrupt.bind(this, vec, cycle+1);
