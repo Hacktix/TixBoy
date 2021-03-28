@@ -123,6 +123,8 @@ function tickPPU() {
                 if(ppu_state._lx === 160) {
                     ppu_state._mode = 0;
                     ppu_state._cycle = 0;
+                    if(ppu_state.stat & 0b1000)
+                        intr_state.if |= 0b10;
                 }
             }
             ppu_state._cycle++;
@@ -134,8 +136,15 @@ function tickPPU() {
             if(++ppu_state._cycle === 114) {
                 ppu_state._cycle = 0;
                 ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
-                if(ppu_state._mode === 1)
+                if(ppu_state._mode === 2 && (ppu_state.stat & 0b100000))
+                    intr_state.if |= 0b10;
+                if(ppu_state.ly === ppu_state.lyc && (ppu_state.stat & 0b1000000))
+                    intr_state.if |= 0b10;
+                if(ppu_state._mode === 1) {
                     intr_state.if |= 1;
+                    if(ppu_state.stat & 0b10000)
+                        intr_state.if |= 0b10;
+                }
             }
             break;
 
@@ -146,6 +155,8 @@ function tickPPU() {
                 if(++ppu_state.ly === 154) {
                     ppu_state.ly = 0;
                     ppu_state._mode = 2;
+                    if(ppu_state.stat & 0b100000)
+                        intr_state.if |= 0b10;
                 }
             }
             break;
