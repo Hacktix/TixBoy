@@ -73,7 +73,7 @@ function writeIO(addr, val) {
     // TODO: Implement I/O Registers
     switch(addr) {
         case 0xff01:
-            document.getElementById("dbgout").innerHTML += String.fromCharCode(val);
+            document.getElementById("dbgout").innerHTML += String.fromCharCode(val).replace("\n", "<br>");
             break;
         case 0xff0f:                                 // IF
             intr_state.if = val;
