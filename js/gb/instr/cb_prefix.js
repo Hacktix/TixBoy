@@ -135,6 +135,64 @@ for(let i = 0x40; i < 0x80; i++) {
 }
 
 //-------------------------------------------------------------------------------
+// RES u3, r8
+//-------------------------------------------------------------------------------
+function _bit_res_hl(bit, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _bit_res_hl.bind(this, bit, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            nextfunc = _bit_res_hl.bind(this, bit, 2);
+            break;
+        case 2:
+            writeByte(registers.hl, tmp.pop() & (~(1 << bit)));
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0x80; i < 0xc0; i++) {
+    let src = ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111];
+    if(src === "(hl)")
+        cb_funcmap[i] = _bit_res_hl.bind(this, (i&0b111000) >> 3);
+    else
+        cb_funcmap[i] = ((bit, target)=>{
+            registers[target] = registers[target] & (~(1 << bit));
+            nextfunc = fetchInstruction;
+        }).bind(this, (i&0b111000) >> 3, src);
+}
+
+//-------------------------------------------------------------------------------
+// SET u3, r8
+//-------------------------------------------------------------------------------
+function _bit_set_hl(bit, cycle) {
+    switch(cycle) {
+        default:
+            nextfunc = _bit_set_hl.bind(this, bit, 1);
+            break;
+        case 1:
+            tmp.push(readByte(registers.hl));
+            nextfunc = _bit_set_hl.bind(this, bit, 2);
+            break;
+        case 2:
+            writeByte(registers.hl, tmp.pop() | (1 << bit));
+            nextfunc = fetchInstruction;
+            break;
+    }
+}
+for(let i = 0xc0; i < 0x100; i++) {
+    let src = ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111];
+    if(src === "(hl)")
+        cb_funcmap[i] = _bit_set_hl.bind(this, (i&0b111000) >> 3);
+    else
+        cb_funcmap[i] = ((bit, target)=>{
+            registers[target] = registers[target] | (1 << bit);
+            nextfunc = fetchInstruction;
+        }).bind(this, (i&0b111000) >> 3, src);
+}
+
+//-------------------------------------------------------------------------------
 // SLA r8
 //-------------------------------------------------------------------------------
 function _sla_mem_hl(cycle) {
