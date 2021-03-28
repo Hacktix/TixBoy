@@ -74,7 +74,7 @@ function _ld_r8_u8(target, cycle) {
             }
             break;
         case 2:
-            writeByte(registers.hl, tmp.pop);
+            writeByte(registers.hl, tmp.pop());
             nextfunc = fetchInstruction;
             //console.log(`  LD ${target}, u8 | write ${target}`);
             break;
