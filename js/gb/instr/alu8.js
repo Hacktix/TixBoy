@@ -121,6 +121,35 @@ for(let i = 0xa8; i < 0xb0; i++) {
 
 
 //-------------------------------------------------------------------------------
+// CP A, r8
+//-------------------------------------------------------------------------------
+function _cp_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _cp_u8.bind(this, 1);
+    else {
+        let cpv = readByte(registers.hl);
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
+        registers.flag_c = cpv > registers.a;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0xb8; i < 0xc0; i++) {
+    if(i === 0xbe) funcmap[i] = _cp_mem_hl;
+    else funcmap[i] = ((source) => {
+        let cpv = registers[source];
+        registers.flag_z = registers.a === cpv;
+        registers.flag_n = true;
+        registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
+        registers.flag_c = cpv > registers.a;
+        nextfunc = fetchInstruction;
+    }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111]);
+}
+
+
+
+//-------------------------------------------------------------------------------
 // AND A, u8
 //-------------------------------------------------------------------------------
 function _and_u8(cycle) {
