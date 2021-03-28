@@ -68,8 +68,8 @@ function _adc_mem_hl(cycle) {
     else {
         let addv = (readByte(registers.hl) + registers.flag_c) & 0xff;
         registers.flag_n = false;
-        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
-        registers.flag_c = registers.a + addv > 0xff;
+        registers.flag_h = (registers.a & 0xf) + (readByte(registers.hl) & 0xf) + registers.flag_c > 0xf;
+        registers.flag_c = registers.a + (readByte(registers.hl) & 0xf) + registers.flag_c > 0xff;
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
@@ -82,8 +82,8 @@ for(let i = 0x88; i < 0x90; i++) {
         funcmap[i] = ((source) => {
             let addv = (registers[source] + registers.flag_c) & 0xff;
             registers.flag_n = false;
-            registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
-            registers.flag_c = registers.a + addv > 0xff;
+            registers.flag_h = (registers.a & 0xf) + (registers[source] & 0xf) + registers.flag_c > 0xf;
+            registers.flag_c = registers.a + registers[source] + registers.flag_c > 0xff;
             registers.a += addv;
             registers.flag_z = registers.a === 0;
             nextfunc = fetchInstruction;
@@ -276,10 +276,11 @@ function _adc_u8(cycle) {
     if(!cycle)
         nextfunc = _adc_u8.bind(this, 1);
     else {
-        let addv = (readByte(registers.pc++) + registers.flag_c) & 0xff;
+        let bv = readByte(registers.pc++);
+        let addv = (bv + registers.flag_c) & 0xff;
         registers.flag_n = false;
-        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
-        registers.flag_c = registers.a + addv > 0xff;
+        registers.flag_h = (registers.a & 0xf) + (bv & 0xf) + registers.flag_c > 0xf;
+        registers.flag_c = registers.a + bv + registers.flag_c > 0xff;
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
