@@ -27,6 +27,39 @@ for(let i = 0xb0; i < 0xb8; i++) {
 
 
 //-------------------------------------------------------------------------------
+// ADD A, r8
+//-------------------------------------------------------------------------------
+function _add_mem_hl(cycle) {
+    if(!cycle)
+        nextfunc = _add_mem_hl.bind(this, 1);
+    else {
+        let addv = readByte(registers.hl);
+        registers.flag_n = false;
+        registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+        registers.flag_c = registers.a + addv > 0xff;
+        registers.a += addv;
+        registers.flag_z = registers.a === 0;
+        nextfunc = fetchInstruction;
+    }
+}
+for(let i = 0x80; i < 0x88; i++) {
+    if(i === 0x86)
+        funcmap[i] = _add_mem_hl;
+    else
+        funcmap[i] = ((source) => {
+            let addv = registers[source];
+            registers.flag_n = false;
+            registers.flag_h = (registers.a & 0xf) + (addv & 0xf) > 0xf;
+            registers.flag_c = registers.a + addv > 0xff;
+            registers.a += addv;
+            registers.flag_z = registers.a === 0;
+            nextfunc = fetchInstruction;
+        }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
+}
+
+
+
+//-------------------------------------------------------------------------------
 // ADC A, r8
 //-------------------------------------------------------------------------------
 function _adc_mem_hl(cycle) {
