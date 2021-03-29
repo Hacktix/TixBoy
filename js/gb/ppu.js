@@ -101,9 +101,14 @@ function tickPPU() {
                 case 4:
                     if(ppu_state._bg_fifo.length === 0) {
                         for(let i = 0x80; i > 0; i >>= 1) {
-                            ppu_state._bg_fifo.push({
-                                color: ((ppu_state._fetcher_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_data_hi & i) ? 0b10 : 0b00)
-                            });
+                            if(ppu_state.lcdc & 1) 
+                                ppu_state._bg_fifo.push({
+                                    color: ((ppu_state._fetcher_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_data_hi & i) ? 0b10 : 0b00)
+                                });
+                            else
+                                ppu_state._bg_fifo.push({
+                                    color: null
+                                });
                         }
                         ppu_state._fetcher_state = 0;
                         ppu_state._fetcher_x++;
@@ -121,7 +126,7 @@ function tickPPU() {
                 else {
                     // Shift out pixel
                     let px = ppu_state._bg_fifo.shift();
-                    let color = (3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*64;
+                    let color = px.color === null ? 256 : Math.floor((3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*(256/3));
                     drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
                     
                     // Check if HBlank should be entered
@@ -172,6 +177,8 @@ function tickPPU() {
                     if(ppu_state.stat & 0b100000)
                         intr_state.if |= 0b10;
                 }
+                if(ppu_state.ly === ppu_state.lyc && (ppu_state.stat & 0b1000000))
+                    intr_state.if |= 0b10;
             }
             break;
     }
