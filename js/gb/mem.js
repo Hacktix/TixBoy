@@ -32,6 +32,8 @@ var readWram = function(addr) {
 function readIO(addr) {
     // TODO: Implement I/O Registers
     switch(addr) {
+        case 0xff00: return input_state.p1;           // P1
+
         // Timer Registers
         case 0xff04: return timer_state.div;          // DIV
         case 0xff05: return timer_state.tima;         // TIMA
@@ -91,6 +93,9 @@ var writeWram = function(addr, val) {
 function writeIO(addr, val) {
     // TODO: Implement I/O Registers
     switch(addr) {
+        case 0xff00: input_state.p1 = val; break;          // P1
+
+        // Timer Registers
         case 0xff04: timer_state.div = val; break;         // DIV
         case 0xff05: timer_state.tima = val; break;        // TIMA
         case 0xff06: timer_state.tma = val; break;         // TMA

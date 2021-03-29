@@ -18,3 +18,6 @@ document.getElementById('rom').addEventListener('change', (e) => {
     });
     fr.readAsArrayBuffer(e.target.files[0]);
 });
+
+document.onkeydown = handleKeyDown;
+document.onkeyup = handleKeyUp;
