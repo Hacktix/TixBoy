@@ -138,7 +138,8 @@ function tickPPU() {
                             for(let i = 0x1, j=0; i > 0; i <<= 1, j++) {
                                 let px = {
                                     color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
-                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
+                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4,
+                                    attrs: ppu_state._fetcher_sprites_sprite.attr
                                 };
                                 if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
                                     continue;
@@ -152,7 +153,8 @@ function tickPPU() {
                             for(let i = 0x80, j=0; i > 0; i >>= 1, j++) {
                                 let px = {
                                     color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
-                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
+                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4,
+                                    attrs: ppu_state._fetcher_sprites_sprite.attr
                                 };
                                 if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
                                     continue;
@@ -227,7 +229,11 @@ function tickPPU() {
                     // Shift out pixel
                     let bgpx = ppu_state._bg_fifo.shift();
                     let sppx = ppu_state._sprite_fifo.length > 0 ? ppu_state._sprite_fifo.shift() : null;
-                    let px = sppx && sppx.color !== 0 ? sppx : bgpx;
+                    let px = (sppx && sppx.color !== 0)
+                                ? ((sppx.attrs & 0x80) && bgpx.color !== 0)
+                                    ? bgpx
+                                    : sppx
+                                : bgpx;
 
                     let color = px.color === null ? 256 : Math.floor((3-(((px.palette !== undefined ? (px.palette ? ppu_state.obp1 : ppu_state.obp0) : ppu_state.bgp) & (0b11 << (2*px.color))) >> (2*px.color)))*(256/3));
                     drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
