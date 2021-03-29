@@ -78,7 +78,16 @@ function tickPPU() {
                         ppu_state._sprite_buffer.push({
                             y: oam[i],
                             x: oam[i+1],
-                            tile: (ppu_state.lcdc & 0b100) ? ((ppu_state.ly + 16) < (oam[i] + 8) ? (oam[i+2] & 0xfe) : (oam[i+2] | 1)) : oam[i+2],
+                            tile: (ppu_state.lcdc & 0b100)
+                                    ? ((ppu_state.ly + 16) < (oam[i] + 8)
+                                        ? (oam[i+3] & 0b1000000)
+                                            ? (oam[i+2] | 0x01)
+                                            : (oam[i+2] & 0xfe)
+                                        : (oam[i+3] & 0b1000000)
+                                            ? (oam[i+2] & 0xfe)
+                                            : (oam[i+2] | 0x01)
+                                    )
+                                    : oam[i+2],
                             attr: oam[i+3]
                         });
                 }
@@ -107,14 +116,18 @@ function tickPPU() {
                         // Fetching tile data low
                         let spr_addr1 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
-                            + 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset
+                            + ((ppu_state._fetcher_sprites_sprite.attr & 0b1000000)
+                                ? (2*((ppu_state.lcdc & 0b100) ? 15 : 7)) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset (Y-Flip)
+                                : 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))                                            // Pixel-based Line Offset (No Y-Flip)
                         ppu_state._fetcher_sprites_data_lo = vram[spr_addr1];
                         break;
                     case 2:
                         // Fetching tile data low
                         let spr_addr2 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
-                            + 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset
+                            + ((ppu_state._fetcher_sprites_sprite.attr & 0b1000000)
+                                ? (2*((ppu_state.lcdc & 0b100) ? 15 : 7)) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset (Y-Flip)
+                                : 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))                                            // Pixel-based Line Offset (No Y-Flip)
                             + 1                                                           // High byte offset
                         ppu_state._fetcher_sprites_data_hi = vram[spr_addr2];
                         break;
