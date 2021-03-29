@@ -10,8 +10,8 @@ function handleKeyDown(e) {
     switch(e.keyCode) {
         case 13: input_state._input_state &= 0b01111111; break;
         case 16: input_state._input_state &= 0b10111111; break;
-        case 83: input_state._input_state &= 0b11011111; break;
-        case 65: input_state._input_state &= 0b11101111; break;
+        case 65: input_state._input_state &= 0b11011111; break;
+        case 83: input_state._input_state &= 0b11101111; break;
         case 40: input_state._input_state &= 0b11110111; break;
         case 38: input_state._input_state &= 0b11111011; break;
         case 37: input_state._input_state &= 0b11111101; break;
@@ -23,8 +23,8 @@ function handleKeyUp(e) {
     switch(e.keyCode) {
         case 13: input_state._input_state |= ~0b01111111; break;
         case 16: input_state._input_state |= ~0b10111111; break;
-        case 83: input_state._input_state |= ~0b11011111; break;
-        case 65: input_state._input_state |= ~0b11101111; break;
+        case 65: input_state._input_state |= ~0b11011111; break;
+        case 83: input_state._input_state |= ~0b11101111; break;
         case 40: input_state._input_state |= ~0b11110111; break;
         case 38: input_state._input_state |= ~0b11111011; break;
         case 37: input_state._input_state |= ~0b11111101; break;
