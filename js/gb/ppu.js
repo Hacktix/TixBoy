@@ -9,6 +9,7 @@ var ppu_state = {
     _fetcher_data_lo: null,
     _fetcher_data_hi: null,
     _fetcher_win: false,
+    _wly: 0,
 
     // LCDC
     lcdc: 0,
@@ -17,7 +18,7 @@ var ppu_state = {
     _stat: 0,
     _mode: 0,
     get stat() { return this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
-    set stat(v) { this._stat = (v & 0b111100); },
+    set stat(v) { this._stat = (v & 0b1111000); },
 
     // Scrolling
     scx: 0,
@@ -60,6 +61,7 @@ function tickPPU() {
                 ppu_state._lx = 0;
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
+                ppu_state._fetcher_win = false;
             }
             break;
 
@@ -72,27 +74,26 @@ function tickPPU() {
                     // Fetching tile number
                     let b_addr0 = (ppu_state._fetcher_win ? ((ppu_state.lcdc & 0b1000000) ? 0x1c00 : 0x1800) : ((ppu_state.lcdc & 0b1000) ? 0x1c00 : 0x1800))
                     let addr_offset0 = 
-                        + (32 * Math.floor(((ppu_state.ly+ppu_state.scy) & 0xff)/8))               // LY Offset
-                        + (Math.floor(ppu_state.scx / 8))                                          // SCX Offset
-                        + ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f)          // X-Offset
+                        + (ppu_state._fetcher_win ? (32 * Math.floor(ppu_state._wly/8)) : (32 * Math.floor(((ppu_state.ly+ppu_state.scy) & 0xff)/8)))  // LY Offset
+                        + (ppu_state._fetcher_win ? ppu_state._fetcher_x : ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f))            // X-Offset
                     let addr0 = b_addr0 + (addr_offset0 & 0x3ff);
                     ppu_state._fetcher_tileno = vram[addr0];
                     break;
                 case 1:
                     // Fetching tile data low
                     let addr1 =
-                        ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
-                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
-                        + (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))                                                                             // Pixel-based Line Offset
+                        ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                                 // Tile Data Base Address
+                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))             // Tile No. Offset
+                        + (ppu_state._fetcher_win ? (2*Math.floor(ppu_state._wly % 8)) : (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))) // Pixel-based Line Offset
                     ppu_state._fetcher_data_lo = vram[addr1];
                     break;
                 case 2:
-                    let addr2 =
-                        ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
-                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
-                        + (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))                                                                             // Pixel-based Line Offset
-                        + 1                                                                                                            // High Byte Offset
                     // Fetching tile data high
+                    let addr2 =
+                        ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                                 // Tile Data Base Address
+                        + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))             // Tile No. Offset
+                        + (ppu_state._fetcher_win ? (2*Math.floor(ppu_state._wly % 8)) : (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))) // Pixel-based Line Offset
+                        + 1                                                                                                                  // High Byte Offset
                     ppu_state._fetcher_data_hi = vram[addr2];
                     break;
                 case 3:
@@ -113,13 +114,15 @@ function tickPPU() {
 
             // Update FIFO
             if(ppu_state._bg_fifo.length) {
-                if(ppu_state._lx < (ppu_state.scx % 8))
+                if(ppu_state._lx < (ppu_state.scx % 8)) {
                     ppu_state._bg_fifo.shift();
+                    ppu_state._lx++;
+                }
                 else {
                     // Shift out pixel
                     let px = ppu_state._bg_fifo.shift();
                     let color = (3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*64;
-                    drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
+                    drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
                     
                     // Check if HBlank should be entered
                     if(ppu_state._lx === (160 + (ppu_state.scx % 8))) {
@@ -127,6 +130,11 @@ function tickPPU() {
                         ppu_state._cycle = 0;
                         if(ppu_state.stat & 0b1000)
                             intr_state.if |= 0b10;
+                    } else if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
+                        ppu_state._fetcher_win = true;
+                        ppu_state._fetcher_state = 0;
+                        ppu_state._fetcher_x = 0;
+                        ppu_state._bg_fifo = [];
                     }
                 }
             }
@@ -139,6 +147,8 @@ function tickPPU() {
             if(++ppu_state._cycle === 114) {
                 ppu_state._cycle = 0;
                 ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
+                if(ppu_state._fetcher_win)
+                    ppu_state._wly++;
                 if(ppu_state._mode === 2 && (ppu_state.stat & 0b100000))
                     intr_state.if |= 0b10;
                 if(ppu_state.ly === ppu_state.lyc && (ppu_state.stat & 0b1000000))
@@ -157,6 +167,7 @@ function tickPPU() {
                 ppu_state._cycle = 0;
                 if(++ppu_state.ly === 154) {
                     ppu_state.ly = 0;
+                    ppu_state._wly = 0;
                     ppu_state._mode = 2;
                     if(ppu_state.stat & 0b100000)
                         intr_state.if |= 0b10;
