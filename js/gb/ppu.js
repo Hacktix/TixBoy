@@ -121,18 +121,34 @@ function tickPPU() {
                     case 3:
                         break;
                     case 4:
-                        for(let i = 0x80, j=0; i > 0; i >>= 1, j++) {
-                            let px = {
-                                color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
-                                palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
-                            };
-                            if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
-                                continue;
-                            if(ppu_state._sprite_fifo[j]) {
-                                if(ppu_state._sprite_fifo[j].color === 0)
-                                    ppu_state._sprite_fifo[j] = px;
-                            } else
-                                ppu_state._sprite_fifo.push(px)
+                        if((ppu_state._fetcher_sprites_sprite.attr & 0b100000)) {
+                            for(let i = 0x1, j=0; i > 0; i <<= 1, j++) {
+                                let px = {
+                                    color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
+                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
+                                };
+                                if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
+                                    continue;
+                                if(ppu_state._sprite_fifo[j]) {
+                                    if(ppu_state._sprite_fifo[j].color === 0)
+                                        ppu_state._sprite_fifo[j] = px;
+                                } else
+                                    ppu_state._sprite_fifo.push(px)
+                            }
+                        } else {
+                            for(let i = 0x80, j=0; i > 0; i >>= 1, j++) {
+                                let px = {
+                                    color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
+                                    palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
+                                };
+                                if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
+                                    continue;
+                                if(ppu_state._sprite_fifo[j]) {
+                                    if(ppu_state._sprite_fifo[j].color === 0)
+                                        ppu_state._sprite_fifo[j] = px;
+                                } else
+                                    ppu_state._sprite_fifo.push(px)
+                            }
                         }
                         ppu_state._fetcher_sprites = false;
                 }
