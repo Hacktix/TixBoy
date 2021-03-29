@@ -108,6 +108,7 @@ function writeIO(addr, val) {
         case 0xff42: ppu_state.scy = val; break;           // SCY
         case 0xff43: ppu_state.scx = val; break;           // SCX
         case 0xff45: ppu_state.lyc = val; break;           // LYC
+        case 0xff46: dma_state.dma_queue = val; break;     // DMA
         case 0xff47: ppu_state.bgp = val; break;           // BGP
         case 0xff48: ppu_state.obp0 = val; break;          // OBP0
         case 0xff49: ppu_state.obp1 = val; break;          // OBP1

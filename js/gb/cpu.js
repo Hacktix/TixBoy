@@ -11,6 +11,7 @@ include('gb/instr/instrs.js');     // Instruction Mappings
 include('gb/interrupts.js');       // Interrupt Handling
 include('gb/timers.js');           // Hardware Timers
 include('gb/ppu.js');              // PPU
+include('gb/dma.js');              // OAM DMA
 
 // Debug breakpoints cause CPU bad
 var debug_brk = [];
@@ -170,6 +171,7 @@ function step() {
     nextfunc();
     tickTimers();
     updatePPU();
+    updateOAMDMA();
 }
 
 // Wrapper called by setInterval() function
