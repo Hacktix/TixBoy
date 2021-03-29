@@ -72,8 +72,7 @@ function tickPPU() {
                     // Fetching tile number
                     let b_addr0 = (ppu_state._fetcher_win ? ((ppu_state.lcdc & 0b1000000) ? 0x1c00 : 0x1800) : ((ppu_state.lcdc & 0b1000) ? 0x1c00 : 0x1800))
                     let addr_offset0 = 
-                        + (32 * Math.floor(ppu_state.ly/8))                                        // LY Offset
-                        + (32*Math.floor(ppu_state.scy / 8))                                       // SCY Offset
+                        + (32 * Math.floor(((ppu_state.ly+ppu_state.scy) & 0xff)/8))               // LY Offset
                         + (Math.floor(ppu_state.scx / 8))                                          // SCX Offset
                         + ((Math.floor(ppu_state.scx / 8) + ppu_state._fetcher_x) & 0x1f)          // X-Offset
                     let addr0 = b_addr0 + (addr_offset0 & 0x3ff);
