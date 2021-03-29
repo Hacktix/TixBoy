@@ -10,9 +10,10 @@ var ppu_state = {
     _fetcher_data_hi: null,
     _fetcher_win: false,
     _wly: 0,
+    _last_stat_state: false,
 
     // LCDC
-    lcdc: 0,
+    lcdc: 0x80,
 
     // STAT
     _stat: 0,
@@ -133,8 +134,6 @@ function tickPPU() {
                     if(ppu_state._lx === (160 + (ppu_state.scx % 8))) {
                         ppu_state._mode = 0;
                         ppu_state._cycle = 0;
-                        if(ppu_state.stat & 0b1000)
-                            intr_state.if |= 0b10;
                     } else if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
                         ppu_state._fetcher_win = true;
                         ppu_state._fetcher_state = 0;
@@ -154,14 +153,8 @@ function tickPPU() {
                 ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
                 if(ppu_state._fetcher_win)
                     ppu_state._wly++;
-                if(ppu_state._mode === 2 && (ppu_state.stat & 0b100000))
-                    intr_state.if |= 0b10;
-                if(ppu_state.ly === ppu_state.lyc && (ppu_state.stat & 0b1000000))
-                    intr_state.if |= 0b10;
                 if(ppu_state._mode === 1) {
                     intr_state.if |= 1;
-                    if(ppu_state.stat & 0b10000)
-                        intr_state.if |= 0b10;
                 }
             }
             break;
@@ -174,14 +167,20 @@ function tickPPU() {
                     ppu_state.ly = 0;
                     ppu_state._wly = 0;
                     ppu_state._mode = 2;
-                    if(ppu_state.stat & 0b100000)
-                        intr_state.if |= 0b10;
                 }
-                if(ppu_state.ly === ppu_state.lyc && (ppu_state.stat & 0b1000000))
-                    intr_state.if |= 0b10;
             }
             break;
     }
+
+    // Update STAT Interrupts
+    let stat_state =
+        ((ppu_state._stat & 0b1000000) && ppu_state.ly === ppu_state.lyc)
+        || ((ppu_state._stat & 0b100000) && ppu_state._mode === 2)
+        || ((ppu_state._stat & 0b10000) && ppu_state._mode === 1)
+        || ((ppu_state._stat & 0b1000) && ppu_state._mode === 0);
+    if(!ppu_state._last_stat_state && stat_state)
+        intr_state.if |= 0b10;
+    ppu_state._last_stat_state = stat_state
 }
 
 function drawPixel(r, g, b, x, y) {
