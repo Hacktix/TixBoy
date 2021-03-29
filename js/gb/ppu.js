@@ -174,6 +174,15 @@ function tickPPU() {
                 break;
             }
 
+            // Check for window to be fetched
+            if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
+                ppu_state._fetcher_win = true;
+                ppu_state._fetcher_state = 0;
+                ppu_state._fetcher_x = 0;
+                ppu_state._bg_fifo = [];
+                ppu_state._sprite_fifo = [];
+            }
+
             // Update BG Fetcher
             switch(ppu_state._fetcher_state++) {
                 case 0:
@@ -246,12 +255,6 @@ function tickPPU() {
                     if(ppu_state._lx >= (160 + (ppu_state.scx % 8))) {
                         ppu_state._mode = 0;
                         ppu_state._cycle = 0;
-                    } else if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
-                        ppu_state._fetcher_win = true;
-                        ppu_state._fetcher_state = 0;
-                        ppu_state._fetcher_x = 0;
-                        ppu_state._bg_fifo = [];
-                        ppu_state._sprite_fifo = [];
                     }
                 }
             }
