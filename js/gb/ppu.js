@@ -180,7 +180,6 @@ function tickPPU() {
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
                 ppu_state._bg_fifo = [];
-                ppu_state._sprite_fifo = [];
             }
 
             // Update BG Fetcher
