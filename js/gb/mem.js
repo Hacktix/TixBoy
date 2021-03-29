@@ -1,3 +1,6 @@
+// Import MBCs
+include('gb/mbc/mbc1.js');
+
 // Variables for memory sections (ROM, RAM, etc.)
 var rom = null;
 var vram = new Array(0x2000).fill(0);
@@ -9,6 +12,19 @@ var hram = new Array(0x7f).fill(0);
 function loadRom(bytes) {
     rom = bytes;
     console.log(`Loaded ${bytes.length} bytes.`);
+
+    // Determine MBC and update read/write functions accordingly
+    switch(rom[0x147]) {
+        case 0x01:
+        case 0x02:
+        case 0x03:
+            MBC1.init(rom[0x147] === 0x01 ? 0 : rom[0x149], rom[0x148]);
+            readRom = MBC1.readRom;
+            readSram = MBC1.readSram;
+            writeRom = MBC1.writeRom;
+            writeSram = MBC1.writeSram;
+            break;
+    }
 }
 
 
@@ -21,6 +37,11 @@ var readRom = function(addr) {
 // Variable readVram function, adjustable for CGB-mode
 var readVram = function(addr) {
     return vram[addr-0x8000];
+}
+
+// Variable readSram function, adjustable for MBCs
+var readSram = function(addr) {
+    return 0xff;
 }
 
 // Variable readWram function, adjustable for CGB-mode
@@ -62,7 +83,7 @@ function readIO(addr) {
 function readByte(addr) {
     if(addr < 0x8000) return readRom(addr);           // ROM
     if(addr < 0xa000) return readVram(addr);          // VRAM
-    if(addr < 0xc000) return 0xff;                    // SRAM (TODO: Add Support)
+    if(addr < 0xc000) return readSram(addr);          // SRAM (TODO: Add Support)
     if(addr < 0xe000) return readWram(addr);          // WRAM
     if(addr < 0xfe00) return readWram(addr - 0x2000); // Echo RAM
     if(addr < 0xfea0) return oam[addr-0xfe00];        // OAM
@@ -83,6 +104,9 @@ var writeRom = function(addr, val) {
 var writeVram = function(addr, val) {
     vram[addr-0x8000] = val;
 }
+
+// Variable writeSram function, adjustable for MBCs
+var writeSram = function(addr, val) { }
 
 // Variable writeWram function, adjustable for CGB-mode
 var writeWram = function(addr, val) {
@@ -120,7 +144,7 @@ function writeIO(addr, val) {
 function writeByte(addr, val) {
     if(addr < 0x8000) writeRom(addr, val);                // ROM
     else if(addr < 0xa000) writeVram(addr, val);          // VRAM
-    else if(addr < 0xc000) return;                        // SRAM (TODO: Add Support)
+    else if(addr < 0xc000) writeSram(addr, val);          // SRAM (TODO: Add Support)
     else if(addr < 0xe000) writeWram(addr, val);          // WRAM
     else if(addr < 0xfe00) writeWram(addr - 0x2000, val); // Echo RAM
     else if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
