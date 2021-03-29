@@ -84,14 +84,14 @@ function tickPPU() {
                     let addr1 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
                         + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
-                        + (2*Math.floor(ppu_state.ly % 8))                                                                             // Pixel-based Line Offset
+                        + (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))                                                                             // Pixel-based Line Offset
                     ppu_state._fetcher_data_lo = vram[addr1];
                     break;
                 case 2:
                     let addr2 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                           // Tile Data Base Address
                         + ((ppu_state.lcdc & 0b10000) ? (16 * ppu_state._fetcher_tileno) : (16 * e8(ppu_state._fetcher_tileno)))       // Tile No. Offset
-                        + (2*Math.floor(ppu_state.ly % 8))                                                                             // Pixel-based Line Offset
+                        + (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))                                                                             // Pixel-based Line Offset
                         + 1                                                                                                            // High Byte Offset
                     // Fetching tile data high
                     ppu_state._fetcher_data_hi = vram[addr2];
@@ -114,17 +114,21 @@ function tickPPU() {
 
             // Update FIFO
             if(ppu_state._bg_fifo.length) {
-                // Shift out pixel
-                let px = ppu_state._bg_fifo.shift();
-                let color = (3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*64;
-                drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
-                
-                // Check if HBlank should be entered
-                if(ppu_state._lx === 160) {
-                    ppu_state._mode = 0;
-                    ppu_state._cycle = 0;
-                    if(ppu_state.stat & 0b1000)
-                        intr_state.if |= 0b10;
+                if(ppu_state._lx < (ppu_state.scx % 8))
+                    ppu_state._bg_fifo.shift();
+                else {
+                    // Shift out pixel
+                    let px = ppu_state._bg_fifo.shift();
+                    let color = (3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*64;
+                    drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
+                    
+                    // Check if HBlank should be entered
+                    if(ppu_state._lx === (160 + (ppu_state.scx % 8))) {
+                        ppu_state._mode = 0;
+                        ppu_state._cycle = 0;
+                        if(ppu_state.stat & 0b1000)
+                            intr_state.if |= 0b10;
+                    }
                 }
             }
             ppu_state._cycle++;
