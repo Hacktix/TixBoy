@@ -2,6 +2,7 @@ var ppu_state = {
     // Internal Variables
     _cycle: 0,
     _bg_fifo: [],
+    _sprite_fifo: [],
     _lx: 0,
     _fetcher_x: 0,
     _fetcher_state: 0,
@@ -11,6 +12,12 @@ var ppu_state = {
     _fetcher_win: false,
     _wly: 0,
     _last_stat_state: false,
+    _sprite_buffer: [],
+    _fetcher_sprites: false,
+    _fetcher_sprites_state: 0,
+    _fetcher_sprites_sprite: null,
+    _fetcher_sprites_data_lo: null,
+    _fetcher_sprites_data_hi: null,
 
     // LCDC
     lcdc: 0x80,
@@ -63,11 +70,74 @@ function tickPPU() {
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
                 ppu_state._fetcher_win = false;
+
+                // Buffer sprites for scanline
+                ppu_state._sprite_buffer = [];
+                for(let i = 0; i < 0xa0 && ppu_state._sprite_buffer.length < 10; i += 4) {
+                    if(oam[i+1] && (ppu_state.ly + 16) >= oam[i] && (ppu_state.ly + 16) < (oam[i] + ((ppu_state.lcdc & 0b100) ? 16 : 8)))
+                        ppu_state._sprite_buffer.push({
+                            y: oam[i],
+                            x: oam[i+1],
+                            tile: (ppu_state.lcdc & 0b100) ? ((ppu_state.ly + 16) < (oam[i] + 8) ? (oam[i+2] & 0xfe) : (oam[i+2] | 1)) : oam[i+2],
+                            attr: oam[i+3]
+                        });
+                }
             }
             break;
 
         case 3:
             // Drawing Mode
+
+            // Check if sprites need to be fetched
+            if(!ppu_state._fetcher_sprites && (ppu_state.lcdc & 0b10)) {
+                let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= (ppu_state._lx + 8));
+                if(render_sprite !== -1) {
+                    ppu_state._fetcher_sprites_sprite = ppu_state._sprite_buffer.splice(render_sprite, 1)[0];
+                    ppu_state._fetcher_sprites_state = 0;
+                    ppu_state._fetcher_sprites = true;
+                }
+            }
+
+            // Update Sprite Fetcher
+            if(ppu_state._fetcher_sprites) {
+                switch(ppu_state._fetcher_sprites_state++) {
+                    case 0:
+                        break;
+                    case 1:
+                        // Fetching tile data low
+                        let spr_addr1 =
+                            16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
+                            + 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset
+                        ppu_state._fetcher_sprites_data_lo = vram[spr_addr1];
+                        break;
+                    case 2:
+                        // Fetching tile data low
+                        let spr_addr2 =
+                            16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
+                            + 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset
+                            + 1                                                           // High byte offset
+                        ppu_state._fetcher_sprites_data_hi = vram[spr_addr2];
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        for(let i = 0x80, j=0; i > 0; i >>= 1, j++) {
+                            let px = {
+                                color: ((ppu_state._fetcher_sprites_data_lo & i) ? 0b01 : 0b00) | ((ppu_state._fetcher_sprites_data_hi & i) ? 0b10 : 0b00),
+                                palette: (ppu_state._fetcher_sprites_sprite.attr & 0b10000) >> 4
+                            };
+                            if((ppu_state._fetcher_sprites_sprite.x + j) < 8)
+                                continue;
+                            if(ppu_state._sprite_fifo[j]) {
+                                if(ppu_state._sprite_fifo[j].color === 0)
+                                    ppu_state._sprite_fifo[j] = px;
+                            } else
+                                ppu_state._sprite_fifo.push(px)
+                        }
+                        ppu_state._fetcher_sprites = false;
+                }
+                break;
+            }
 
             // Update BG Fetcher
             switch(ppu_state._fetcher_state++) {
@@ -126,8 +196,11 @@ function tickPPU() {
                 }
                 else {
                     // Shift out pixel
-                    let px = ppu_state._bg_fifo.shift();
-                    let color = px.color === null ? 256 : Math.floor((3-((ppu_state.bgp & (0b11 << (2*px.color))) >> (2*px.color)))*(256/3));
+                    let bgpx = ppu_state._bg_fifo.shift();
+                    let sppx = ppu_state._sprite_fifo.length > 0 ? ppu_state._sprite_fifo.shift() : null;
+                    let px = sppx && sppx.color !== 0 ? sppx : bgpx;
+
+                    let color = px.color === null ? 256 : Math.floor((3-(((px.palette !== undefined ? (px.palette ? ppu_state.obp1 : ppu_state.obp0) : ppu_state.bgp) & (0b11 << (2*px.color))) >> (2*px.color)))*(256/3));
                     drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
                     
                     // Check if HBlank should be entered
@@ -139,6 +212,7 @@ function tickPPU() {
                         ppu_state._fetcher_state = 0;
                         ppu_state._fetcher_x = 0;
                         ppu_state._bg_fifo = [];
+                        ppu_state._sprite_fifo = [];
                     }
                 }
             }
