@@ -63,9 +63,10 @@ function tickPPU() {
     switch(ppu_state._mode) {
         case 2:
             // OAM Scan Mode
-            if(++ppu_state._cycle === 20) {
+            if(++ppu_state._cycle === 80) {
                 ppu_state._mode = 3;
                 ppu_state._bg_fifo = [];
+                ppu_state._sprite_fifo = [];
                 ppu_state._lx = 0;
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
@@ -79,13 +80,15 @@ function tickPPU() {
                             y: oam[i],
                             x: oam[i+1],
                             tile: (ppu_state.lcdc & 0b100)
-                                    ? ((ppu_state.ly + 16) < (oam[i] + 8)
-                                        ? (oam[i+3] & 0b1000000)
+                                    ? (((ppu_state.ly + 16) < (oam[i]-8))
+                                        ? ((oam[i+3] & 0b1000000)
                                             ? (oam[i+2] | 0x01)
-                                            : (oam[i+2] & 0xfe)
-                                        : (oam[i+3] & 0b1000000)
-                                            ? (oam[i+2] & 0xfe)
                                             : (oam[i+2] | 0x01)
+                                        )
+                                        : ((oam[i+3] & 0b1000000)
+                                            ? (oam[i+2] & 0xfe)
+                                            : (oam[i+2] & 0xfe)
+                                        )
                                     )
                                     : oam[i+2],
                             attr: oam[i+3]
@@ -96,10 +99,11 @@ function tickPPU() {
 
         case 3:
             // Drawing Mode
+            ppu_state._cycle++;
 
             // Check if sprites need to be fetched
             if(!ppu_state._fetcher_sprites && (ppu_state.lcdc & 0b10)) {
-                let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= (ppu_state._lx + 8));
+                let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= ((ppu_state._lx - (ppu_state.scx % 8)) + 8));
                 if(render_sprite !== -1) {
                     ppu_state._fetcher_sprites_sprite = ppu_state._sprite_buffer.splice(render_sprite, 1)[0];
                     ppu_state._fetcher_sprites_state = 0;
@@ -117,8 +121,8 @@ function tickPPU() {
                         let spr_addr1 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
                             + ((ppu_state._fetcher_sprites_sprite.attr & 0b1000000)
-                                ? (2*((ppu_state.lcdc & 0b100) ? 15 : 7)) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset (Y-Flip)
-                                : 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))                                            // Pixel-based Line Offset (No Y-Flip)
+                                ? (((ppu_state.lcdc & 0b100) ? 30 : 14) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))     // Pixel-based Line Offset (Y-Flip)
+                                : (2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))))                                           // Pixel-based Line Offset (No Y-Flip)
                         ppu_state._fetcher_sprites_data_lo = vram[spr_addr1];
                         break;
                     case 2:
@@ -126,8 +130,8 @@ function tickPPU() {
                         let spr_addr2 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
                             + ((ppu_state._fetcher_sprites_sprite.attr & 0b1000000)
-                                ? (2*((ppu_state.lcdc & 0b100) ? 15 : 7)) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))   // Pixel-based Line Offset (Y-Flip)
-                                : 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))                                            // Pixel-based Line Offset (No Y-Flip)
+                                ? (((ppu_state.lcdc & 0b100) ? 30 : 14) - 2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16)))     // Pixel-based Line Offset (Y-Flip)
+                                : (2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))))                                           // Pixel-based Line Offset (No Y-Flip)
                             + 1                                                           // High byte offset
                         ppu_state._fetcher_sprites_data_hi = vram[spr_addr2];
                         break;
@@ -239,7 +243,7 @@ function tickPPU() {
                     drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
                     
                     // Check if HBlank should be entered
-                    if(ppu_state._lx === (160 + (ppu_state.scx % 8))) {
+                    if(ppu_state._lx >= (160 + (ppu_state.scx % 8))) {
                         ppu_state._mode = 0;
                         ppu_state._cycle = 0;
                     } else if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
@@ -251,13 +255,12 @@ function tickPPU() {
                     }
                 }
             }
-            ppu_state._cycle++;
 
             break;
 
         case 0:
             // HBlank Mode
-            if(++ppu_state._cycle === 114) {
+            if(++ppu_state._cycle === 456) {
                 ppu_state._cycle = 0;
                 ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
                 if(ppu_state._fetcher_win)
@@ -270,7 +273,7 @@ function tickPPU() {
 
         case 1:
             // VBlank Mode
-            if(++ppu_state._cycle === 114) {
+            if(++ppu_state._cycle === 456) {
                 ppu_state._cycle = 0;
                 if(++ppu_state.ly === 154) {
                     ppu_state.ly = 0;
