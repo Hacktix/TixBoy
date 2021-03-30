@@ -15,9 +15,10 @@ class MBC1 {
         if(addr < 0x2000)
             MBC1._enram = (val & 0xf) === 0xa;
         else if(addr < 0x4000) {
-            MBC1._romb = val & [0, 0b11, 0b111, 0b1111, 0b11111, 0b11111, 0b11111][MBC1._romsize];
-            if(!MBC1._romb)
-                MBC1._romb++;
+            if((val & 0x1f) === 0)
+                MBC1._romb = 1;
+            else
+                MBC1._romb = val & [0, 0b11, 0b111, 0b1111, 0b11111, 0b11111, 0b11111][MBC1._romsize];
         }
         else if(addr < 0x6000)
             MBC1._ramb = val & 0b11;
