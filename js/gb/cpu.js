@@ -129,7 +129,7 @@ function fetchInstruction() {
         if(intr_state.ime) {
             let vec = 0x40;
             let bmp = 1;
-            while((intr_state.if & bmp) === 0) {
+            while(((intr_state.if & intr_state.ie) & bmp) === 0) {
                 bmp <<= 1;
                 vec += 0x8;
             }
@@ -145,13 +145,13 @@ function fetchInstruction() {
         return;
 
     // Debug Logging
-    if(DEBUG_LOG_DOWNLOAD)
+    if(!bootrom_mapped && DEBUG_LOG_DOWNLOAD)
         dbg_log.push(`A: ${registers.a.toString(16).padStart(2, '0')} F: ${registers.f.toString(16).padStart(2, '0')} B: ${registers.b.toString(16).padStart(2, '0')} C: ${registers.c.toString(16).padStart(2, '0')} D: ${registers.d.toString(16).padStart(2, '0')} E: ${registers.e.toString(16).padStart(2, '0')} H: ${registers.h.toString(16).padStart(2, '0')} L: ${registers.l.toString(16).padStart(2, '0')} SP: ${registers.sp.toString(16).padStart(4, '0')} PC: 00:${registers.pc.toString(16).padStart(4, '0')} (${readByte(registers.pc).toString(16).padStart(2, '0')} ${readByte(registers.pc+1).toString(16).padStart(2, '0')} ${readByte(registers.pc+2).toString(16).padStart(2, '0')} ${readByte(registers.pc+3).toString(16).padStart(2, '0')})`.toUpperCase());
     if(DEBUG_LOG_LEN_LIMIT > 0 && dbg_log.length === DEBUG_LOG_LEN_LIMIT)
         throw "Log length limit reached."
 
     // Breakpoints
-    if(debug_brk.includes(registers.pc) && intervalId !== null)
+    if(!bootrom_mapped && debug_brk.includes(registers.pc) && intervalId !== null)
         throw `Breakpoint hit: $${registers.pc.toString(16).padStart(4, '0')}`;
 
     // Decode & Run Opcode
