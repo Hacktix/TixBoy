@@ -1,8 +1,10 @@
 var dma_state = {
     _dma_queue: 0,
     _dma_src_ptr: 0,
+    _read_data: 0xff,
 
     set dma_queue(v) {
+        this._read_data = v;
         if(!this.dma_active) {
             this._dma_queue = 2;
             this._dma_src_ptr = v << 8;

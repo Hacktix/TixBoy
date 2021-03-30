@@ -70,6 +70,7 @@ function readIO(addr) {
         case 0xff43: return ppu_state.scx;            // SCX
         case 0xff44: return ppu_state.ly;             // LY
         case 0xff45: return ppu_state.lyc;            // LYC
+        case 0xff46: return dma_state._read_data      // DMA
         case 0xff47: return ppu_state.bgp;            // BGP
         case 0xff48: return ppu_state.obp0;           // OBP0
         case 0xff49: return ppu_state.obp1;           // OBP1
