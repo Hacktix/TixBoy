@@ -6,7 +6,10 @@ var timer_state = {
     // DIV Register
     _div_internal: 0,
     get div() { return (this._div_internal & 0xff00) >> 8; },
-    set div(v) { this._div_internal = 0; },
+    set div(v) {
+        this._div_internal = 0;
+        tickTimers(false);
+    },
 
     // TIMA Register
     _tima: 0,
@@ -19,20 +22,25 @@ var timer_state = {
     // TAC Register
     _tac: 0,
     get tac() { return this._tac; },
-    set tac(v) { this._tac = v & 0b111; },
+    set tac(v) {
+        this._tac = v & 0b111;
+        tickTimers(false);
+    },
 
     // TMA Register
     tma: 0
 };
 
-function tickTimers() {
+function tickTimers(inc = true) {
     // Increment internal DIV
-    timer_state._div_internal += 4;
+    if(inc) {
+        timer_state._div_internal += 4;
 
-    // Check if TIMA reload is required
-    if(timer_state._queued_reload) {
-        timer_state.tima = timer_state.tma;
-        intr_state.if |= 0b100;
+        // Check if TIMA reload is required
+        if(timer_state._queued_reload) {
+            timer_state.tima = timer_state.tma;
+            intr_state.if |= 0b100;
+        }
     }
 
     // Check for falling edge
