@@ -1,0 +1,36 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    background-image: url('bg.png');
+    background-repeat: no-repeat;
+    background-position-x: center;
+}
+
+canvas {
+    border-radius: 5%;
+    margin-top: 122px;
+}
+
+.fileinput {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+.fileinput + label {
+    margin-top: 10px;
+    font-size: 1.25em;
+    font-weight: 700;
+    color: #1f246a;
+    background-color: #717286;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid #1f246a;
+}
+.fileinput:focus + label,
+.fileinput + label:hover {
+    background-color: #8C8EA5;
+}
