@@ -19,16 +19,16 @@ var debug_brk = [];
 // CPU Registers
 var registers = {
     // Internal register values
-    _a: 0x01,
-    _f: 0xb0,
-    _b: 0x00,
-    _c: 0x13,
-    _d: 0x00,
-    _e: 0xd8,
-    _h: 0x01,
-    _l: 0x4d,
-    _pc: 0x100,
-    _sp: 0xfffe,
+    _a: 0,
+    _f: 0,
+    _b: 0,
+    _c: 0,
+    _d: 0,
+    _e: 0,
+    _h: 0,
+    _l: 0,
+    _pc: 0,
+    _sp: 0,
 
     // 8-bit Getters
     get a() { return this._a; },
