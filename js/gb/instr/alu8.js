@@ -9,7 +9,6 @@ function _or_mem_hl(cycle) {
         registers.flag_n = registers.flag_h = registers.flag_c = false;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  OR a, (hl)`);
     }
 }
 for(let i = 0xb0; i < 0xb8; i++) {
@@ -20,7 +19,6 @@ for(let i = 0xb0; i < 0xb8; i++) {
             registers.a |= registers[source];
             registers.flag_n = registers.flag_h = registers.flag_c = false;
             registers.flag_z = registers.a === 0;
-            //console.log(`  OR a, ${source}`);
         }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
 }
 
@@ -132,7 +130,6 @@ function _xor_mem_hl(cycle) {
         registers.flag_n = registers.flag_h = registers.flag_c = false;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  XOR a, (hl)`);
     }
 }
 for(let i = 0xa8; i < 0xb0; i++) {
@@ -143,7 +140,6 @@ for(let i = 0xa8; i < 0xb0; i++) {
             registers.a ^= registers[source];
             registers.flag_n = registers.flag_h = registers.flag_c = false;
             registers.flag_z = registers.a === 0;
-            //console.log(`  XOR a, ${source}`);
         }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][i & 0b111])
 }
 
@@ -254,7 +250,6 @@ function _and_u8(cycle) {
         registers.flag_h = true;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  AND a, u8`);
     }
 }
 funcmap[0xe6] = _and_u8;
@@ -289,7 +284,6 @@ function _xor_u8(cycle) {
         registers.flag_n = registers.flag_h = registers.flag_c = false;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  XOR a, (hl)`);
     }
 }
 funcmap[0xee] = _xor_u8;
@@ -309,7 +303,6 @@ function _cp_u8(cycle) {
         registers.flag_h = (cpv & 0xf) > (registers.a & 0xf)
         registers.flag_c = cpv > registers.a;
         nextfunc = fetchInstruction;
-        //console.log(`  CP a, u8 | read u8`);
     }
 }
 funcmap[0xfe] = _cp_u8;
@@ -352,7 +345,6 @@ function _sbc_u8(cycle) {
         registers.flag_c = bv + registers.flag_c > registers.a;
         registers.a -= cpv;
         nextfunc = fetchInstruction;
-        // console.log(`  SUB a, u8 | read u8`);
     }
 }
 funcmap[0xde] = _sbc_u8;
@@ -373,7 +365,6 @@ function _add_u8(cycle) {
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  ADD a, u8`);
     }
 }
 funcmap[0xc6] = _add_u8;
@@ -395,7 +386,6 @@ function _adc_u8(cycle) {
         registers.a += addv;
         registers.flag_z = registers.a === 0;
         nextfunc = fetchInstruction;
-        //console.log(`  ADC a, u8`);
     }
 }
 funcmap[0xce] = _adc_u8;

@@ -9,27 +9,22 @@ function _call_u16(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_u16.bind(this, 2);
-            //console.log(`  CALL u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
             nextfunc = _call_u16.bind(this, 3);
-            //console.log(`  CALL u16 | read u16:upper`);
             break;
         case 3:
             nextfunc = _call_u16.bind(this, 4);
-            //console.log(`  CALL u16 | branch decision?`);
             break;
         case 4:
             writeByte(--registers.sp, (registers.pc & 0xff00) >> 8);
             nextfunc = _call_u16.bind(this, 5);
-            //console.log(`  CALL u16 | write pc:upper->(--sp)`);
             break;
         case 5:
             writeByte(--registers.sp, registers.pc & 0xff);
             registers.pc = tmp.pop();
             nextfunc = fetchInstruction;
-            //console.log(`  CALL u16 | write pc:upper->(--sp)`);
             break;
     }
 }
@@ -48,16 +43,13 @@ function _jp_u16(cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _jp_u16.bind(this, 2);
-            //console.log("  JP u16 | read u16:lower");
             break;
         case 2:
             registers.pc = (readByte(registers.pc) << 8) + tmp.pop();
             nextfunc = _jp_u16.bind(this, 3);
-            //console.log("  JP u16 | read u16:upper");
             break;
         case 3:
             nextfunc = fetchInstruction;
-            //console.log("  JP u16 | branch decision?");
             break;
     }
 }
@@ -147,12 +139,10 @@ function _jr_e8(cycle) {
         case 1:
             tmp.push(e8(readByte(registers.pc++)));
             nextfunc = _jr_e8.bind(this, 2);
-            //console.log(`  JR i8 | read i8`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            //console.log(`  JR i8 | modify pc`);
             break;
     }
 }
@@ -171,17 +161,14 @@ function _ret(cycle) {
         case 1:
             tmp.push(readByte(registers.sp++));
             nextfunc = _ret.bind(this, 2);
-            //console.log(`  RET | read (sp++)->lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.sp++) << 8));
             nextfunc = _ret.bind(this, 3);
-            //console.log(`  RET | read (sp++)->upper`);
             break;
         case 3:
             registers.pc = tmp.pop();
             nextfunc = fetchInstruction;
-            //console.log(`  RET | set pc?`);
             break;
     }
 }
@@ -220,12 +207,10 @@ function _jr_z(compare, cycle) {
                 tmp.push(v);
                 nextfunc = _jr_z.bind(this, compare, 2);
             }
-            //console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | read`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            //console.log(`  JR ${compare ? 'Z' : 'NZ'}, i8 | modify PC`);
     }
 }
 funcmap[0x20] = _jr_z.bind(this, false);
@@ -249,12 +234,10 @@ function _jr_c(compare, cycle) {
                 tmp.push(v);
                 nextfunc = _jr_c.bind(this, compare, 2);
             }
-            //console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | read`);
             break;
         case 2:
             registers.pc += tmp.pop();
             nextfunc = fetchInstruction;
-            //console.log(`  JR ${compare ? 'C' : 'NC'}, i8 | modify PC`);
     }
 }
 funcmap[0x30] = _jr_c.bind(this, false);
@@ -275,7 +258,6 @@ function _ret_c(compare, cycle) {
                 nextfunc = fetchInstruction;
             else
                 nextfunc = _ret.bind(this, 1);
-            //console.log(`  RET ${compare ? 'C' : 'NC'} | branch decision`);
             break;
     }
 }
@@ -297,7 +279,6 @@ function _ret_z(compare, cycle) {
                 nextfunc = fetchInstruction;
             else
                 nextfunc = _ret.bind(this, 1);
-            //console.log(`  RET ${compare ? 'Z' : 'NZ'} | branch decision`);
             break;
     }
 }
@@ -317,7 +298,6 @@ function _call_z(compare, cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_z.bind(this, compare, 2);
-            //console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
@@ -327,7 +307,6 @@ function _call_z(compare, cycle) {
                 tmp.pop();
                 nextfunc = fetchInstruction;
             }
-            //console.log(`  CALL ${compare ? 'Z' : 'NZ'} u16 | read u16:upper`);
             break;
     }
 }
@@ -347,7 +326,6 @@ function _call_c(compare, cycle) {
         case 1:
             tmp.push(readByte(registers.pc++));
             nextfunc = _call_c.bind(this, compare, 2);
-            //console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:lower`);
             break;
         case 2:
             tmp.push(tmp.pop() | (readByte(registers.pc++) << 8));
@@ -357,7 +335,6 @@ function _call_c(compare, cycle) {
                 tmp.pop();
                 nextfunc = fetchInstruction;
             }
-            //console.log(`  CALL ${compare ? 'C' : 'NC'} u16 | read u16:upper`);
             break;
     }
 }

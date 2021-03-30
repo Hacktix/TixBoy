@@ -31,7 +31,6 @@ for(let i = 0x04; i <= 0x3c; i += 0x08) {
             registers.flag_n = false;
             registers[target] = v;
             nextfunc = fetchInstruction;
-            //console.log(`  INC ${target}`);
         }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][(i & 0b111000) >> 3])
 }
 
@@ -68,7 +67,6 @@ for(let i = 0x05; i <= 0x3d; i += 0x08) {
             registers.flag_n = true;
             registers[target] = v;
             nextfunc = fetchInstruction;
-            //console.log(`  DEC ${target}`);
         }).bind(this, ["b", "c", "d", "e", "h", "l", "(hl)", "a"][(i & 0b111000) >> 3])
 }
 
@@ -83,7 +81,6 @@ function _inc_r16(target, cycle) {
     else {
         registers[target]++;
         nextfunc = fetchInstruction;
-        //console.log(`  INC ${target}`);
     }
 }
 for(let i = 0x03; i <= 0x33; i += 0x10)

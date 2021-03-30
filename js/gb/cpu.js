@@ -167,7 +167,6 @@ function fetchInstruction() {
 
 // Wrapper for a single next-tick-function call
 function step() {
-    //console.log(`* Cycle ${CYCLE_COUNT++} (PC: $${registers.pc.toString(16).padStart(4, '0')})`);
     nextfunc();
     tickTimers();
     updatePPU();
