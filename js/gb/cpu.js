@@ -1,4 +1,4 @@
-const CLOCK_FREQ = 4194304;
+const CLOCK_FREQ = 4194304/4;
 const BLOCK_SIZE = 5000;
 const DEBUG_LOG_DOWNLOAD = false;
 const DEBUG_LOG_LEN_LIMIT = 0;

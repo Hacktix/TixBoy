@@ -281,6 +281,7 @@ function tickPPU() {
                     ppu_state.ly = 0;
                     ppu_state._wly = 0;
                     ppu_state._mode = 2;
+                    renderFrame();
                 }
             }
             break;
@@ -297,7 +298,15 @@ function tickPPU() {
     ppu_state._last_stat_state = stat_state
 }
 
-function drawPixel(r, g, b, x, y) {
-    lcd.fillStyle = `rgb(${r},${g},${b})`;
-    lcd.fillRect(x, y, 1, 1);
+async function drawPixel(r, g, b, x, y) {
+    let pxBase = (4*x) + (4*160*y);
+    lcdData.data[pxBase+0] = r;
+    lcdData.data[pxBase+1] = g;
+    lcdData.data[pxBase+2] = b;
+    lcdData.data[pxBase+3] = 255;
+}
+
+async function renderFrame() {
+    tmplcd.putImageData(lcdData, 0, 0);
+    lcd.drawImage(tmpcanvas, 0, 0, 160, 144)
 }
