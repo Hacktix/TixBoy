@@ -167,6 +167,7 @@ function fetchInstruction() {
 
 // Wrapper for a single next-tick-function call
 function step() {
+    CYCLE_COUNT++;
     nextfunc();
     tickTimers();
     updatePPU();
