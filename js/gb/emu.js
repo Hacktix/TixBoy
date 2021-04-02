@@ -1,6 +1,7 @@
 // Import required modules
 include('gb/cpu.js');
 include('gb/mem.js');
+include('gb/audio.js');
 
 // Initialize offscreen canvas
 const tmpcanvas = document.createElement('canvas');

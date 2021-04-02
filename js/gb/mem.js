@@ -158,6 +158,16 @@ function writeIO(addr, val) {
         case 0xff07: timer_state.tac = val; break;         // TAC
         case 0xff0f: intr_state.if = val; break;           // IF
 
+        // APU Registers
+        case 0xff12: audio_ch1.nr12 = val; break;
+        case 0xff13: audio_ch1.nr13 = val; break;
+        case 0xff14: audio_ch1.nr14 = val; break;
+        case 0xff17: audio_ch2.nr22 = val; break;
+        case 0xff18: audio_ch2.nr23 = val; break;
+        case 0xff19: audio_ch2.nr24 = val; break;
+        case 0xff24: audio_state.nr50 = val; break;
+        case 0xff25: audio_state.nr51 = val; break;
+
         // PPU Registers
         case 0xff40: ppu_state.lcdc = val; break;          // LCDC
         case 0xff41: ppu_state.stat = val; break;          // STAT
