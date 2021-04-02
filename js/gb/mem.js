@@ -1,5 +1,6 @@
 // Import MBCs
 include('gb/mbc/mbc1.js');
+include('gb/mbc/mbc3.js');
 include('gb/mbc/mbc5.js');
 
 // Bootroms
@@ -29,6 +30,17 @@ function loadRom(bytes) {
             readSram = MBC1.readSram;
             writeRom = MBC1.writeRom;
             writeSram = MBC1.writeSram;
+            break;
+        case 0x0f:
+        case 0x10:
+        case 0x11:
+        case 0x12:
+        case 0x13:
+            MBC3.init([0x0f, 0x11].includes(rom[0x147]) ? 0 : rom[0x149], rom[0x148]);
+            readRom = MBC3.readRom;
+            readSram = MBC3.readSram;
+            writeRom = MBC3.writeRom;
+            writeSram = MBC3.writeSram;
             break;
         case 0x19:
         case 0x1a:
