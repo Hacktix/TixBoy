@@ -67,7 +67,7 @@ function tickPPU() {
                 ppu_state._mode = 3;
                 ppu_state._bg_fifo = [];
                 ppu_state._sprite_fifo = [];
-                ppu_state._lx = 0;
+                ppu_state._lx = -(ppu_state.scx % 8);
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
                 ppu_state._fetcher_win = false;
@@ -103,7 +103,7 @@ function tickPPU() {
 
             // Check if sprites need to be fetched
             if(!ppu_state._fetcher_sprites && (ppu_state.lcdc & 0b10)) {
-                let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= ((ppu_state._lx - (ppu_state.scx % 8)) + 8));
+                let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= ((ppu_state._lx) + 8));
                 if(render_sprite !== -1) {
                     ppu_state._fetcher_sprites_sprite = ppu_state._sprite_buffer.splice(render_sprite, 1)[0];
                     ppu_state._fetcher_sprites_state = 0;
@@ -175,7 +175,7 @@ function tickPPU() {
             }
 
             // Check for window to be fetched
-            if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx - (ppu_state.scx % 8)) >= (ppu_state.wx - 7)) {
+            if((ppu_state.lcdc & 0b100000) && !ppu_state._fetcher_win && ppu_state.ly >= ppu_state.wy && (ppu_state._lx) >= (ppu_state.wx - 7)) {
                 ppu_state._fetcher_win = true;
                 ppu_state._fetcher_state = 0;
                 ppu_state._fetcher_x = 0;
@@ -233,7 +233,7 @@ function tickPPU() {
 
             // Update FIFO
             if(ppu_state._bg_fifo.length) {
-                if(ppu_state._lx < (ppu_state.scx % 8)) {
+                if(ppu_state._lx < 0) {
                     ppu_state._bg_fifo.shift();
                     ppu_state._lx++;
                 }
@@ -248,10 +248,10 @@ function tickPPU() {
                                 : bgpx;
 
                     let color = px.color === null ? 256 : Math.floor((3-(((px.palette !== undefined ? (px.palette ? ppu_state.obp1 : ppu_state.obp0) : ppu_state.bgp) & (0b11 << (2*px.color))) >> (2*px.color)))*(256/3));
-                    drawPixel(color, color, color, (ppu_state._lx++ - (ppu_state.scx % 8)), ppu_state.ly);
+                    drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
                     
                     // Check if HBlank should be entered
-                    if(ppu_state._lx >= (160 + (ppu_state.scx % 8))) {
+                    if(ppu_state._lx >= 160) {
                         ppu_state._mode = 0;
                         ppu_state._cycle = 0;
                     }
