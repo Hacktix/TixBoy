@@ -7,7 +7,6 @@ class MBC5 {
 
         MBC5._romb = 1;
         MBC5._ramb = 0;
-        MBC5._mode = 0;
         MBC5._enram = false;
     }
 
