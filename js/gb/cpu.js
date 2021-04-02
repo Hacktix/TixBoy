@@ -173,6 +173,13 @@ function step() {
     updateOAMDMA();
 }
 
+// Debugging function for stepping over individual instructions
+function stepInstr() {
+    do {
+        step();
+    } while(nextfunc !== fetchInstruction);
+}
+
 // Wrapper called by setInterval() function
 function execBlock() {
     try {
