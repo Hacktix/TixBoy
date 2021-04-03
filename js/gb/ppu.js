@@ -18,6 +18,7 @@ var ppu_state = {
     _fetcher_sprites_sprite: null,
     _fetcher_sprites_data_lo: null,
     _fetcher_sprites_data_hi: null,
+    _reset: false,
 
     // LCDC
     lcdc: 0x80,
@@ -25,7 +26,7 @@ var ppu_state = {
     // STAT
     _stat: 0,
     _mode: 0,
-    get stat() { return this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
+    get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
     set stat(v) { this._stat = (v & 0b1111000); },
 
     // Scrolling
@@ -48,14 +49,19 @@ var ppu_state = {
 
 function updatePPU() {
     if(ppu_state.lcdc & 0b10000000) {
+        if(ppu_state._reset) {
+            ppu_state._reset = false;
+            ppu_state._mode = 2;
+        }
         tickPPU();
         tickPPU();
         tickPPU();
         tickPPU();
-    } else {
+    } else if(!ppu_state._reset) {
         ppu_state._mode = 0;
         ppu_state.ly = 0;
         ppu_state._cycle = 0;
+        ppu_state._reset = true;
     }
 }
 
@@ -114,9 +120,9 @@ function tickPPU() {
             // Update Sprite Fetcher
             if(ppu_state._fetcher_sprites) {
                 switch(ppu_state._fetcher_sprites_state++) {
-                    case 0:
-                        break;
-                    case 1:
+                    case 0: break;
+                    case 1: break;
+                    case 2:
                         // Fetching tile data low
                         let spr_addr1 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
@@ -125,7 +131,8 @@ function tickPPU() {
                                 : (2*(ppu_state.ly-(ppu_state._fetcher_sprites_sprite.y-16))))                                           // Pixel-based Line Offset (No Y-Flip)
                         ppu_state._fetcher_sprites_data_lo = vram[spr_addr1];
                         break;
-                    case 2:
+                    case 3: break;
+                    case 4:
                         // Fetching tile data low
                         let spr_addr2 =
                             16 * ppu_state._fetcher_sprites_sprite.tile                   // Tile No. Offset
@@ -135,9 +142,8 @@ function tickPPU() {
                             + 1                                                           // High byte offset
                         ppu_state._fetcher_sprites_data_hi = vram[spr_addr2];
                         break;
-                    case 3:
-                        break;
-                    case 4:
+                    case 5: break;
+                    case 6:
                         if((ppu_state._fetcher_sprites_sprite.attr & 0b100000)) {
                             for(let i = 0x1, j=0; i > 0; i <<= 1, j++) {
                                 let px = {
@@ -193,7 +199,8 @@ function tickPPU() {
                     let addr0 = b_addr0 + (addr_offset0 & 0x3ff);
                     ppu_state._fetcher_tileno = vram[addr0];
                     break;
-                case 1:
+                case 1: break;
+                case 2:
                     // Fetching tile data low
                     let addr1 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                                 // Tile Data Base Address
@@ -201,7 +208,8 @@ function tickPPU() {
                         + (ppu_state._fetcher_win ? (2*Math.floor(ppu_state._wly % 8)) : (2*Math.floor((ppu_state.ly + ppu_state.scy) % 8))) // Pixel-based Line Offset
                     ppu_state._fetcher_data_lo = vram[addr1];
                     break;
-                case 2:
+                case 3: break;
+                case 4:
                     // Fetching tile data high
                     let addr2 =
                         ((ppu_state.lcdc & 0b10000) === 0 ? 0x1000 : 0x0000)                                                                 // Tile Data Base Address
@@ -210,9 +218,10 @@ function tickPPU() {
                         + 1                                                                                                                  // High Byte Offset
                     ppu_state._fetcher_data_hi = vram[addr2];
                     break;
-                case 3:
+                case 5:
+                case 6:
                     break;
-                case 4:
+                case 7:
                     if(ppu_state._bg_fifo.length === 0) {
                         for(let i = 0x80; i > 0; i >>= 1) {
                             if(ppu_state.lcdc & 1) 
@@ -251,7 +260,7 @@ function tickPPU() {
                     drawPixel(color, color, color, ppu_state._lx++, ppu_state.ly);
                     
                     // Check if HBlank should be entered
-                    if(ppu_state._lx >= 160) {
+                    if(ppu_state._lx === 160) {
                         ppu_state._mode = 0;
                         ppu_state._cycle = 0;
                     }
