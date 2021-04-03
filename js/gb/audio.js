@@ -111,7 +111,7 @@ var audio_state = {
                     env_period: this._env_period,
                     env_counter: this._env_counter,
 
-                    len: this._len,
+                    len: 64-this._len,
                     enable_len: this._enable_len
                 };
             }
@@ -176,7 +176,7 @@ var audio_state = {
                     env_period: this._env_period,
                     env_counter: this._env_counter,
 
-                    len: this._len,
+                    len: 64-this._len,
                     enable_len: this._enable_len
                 };
             }
@@ -204,7 +204,19 @@ function tickAudio() {
 }
 
 function tickLength() {
+    // Channel 1
+    if(audio_state.ch1._en && audio_state.ch1._active.enable_len && audio_state.ch1._active.len > 0 && --audio_state.ch1._active.len === 0) {
+        audio_state.ch1._ctrl.gain.value = 0;
+        audio_state.ch1._active = null;
+        audio_state.ch1._en = false;
+    }
 
+    // Channel 2
+    if(audio_state.ch2._en && audio_state.ch2._active.enable_len && audio_state.ch2._active.len > 0 && --audio_state.ch2._active.len === 0) {
+        audio_state.ch2._ctrl.gain.value = 0;
+        audio_state.ch2._active = null;
+        audio_state.ch2._en = false;
+    }
 }
 
 function tickVolEnv() {
