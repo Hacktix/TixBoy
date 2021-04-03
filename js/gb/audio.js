@@ -101,8 +101,8 @@ var audio_state = {
                 this._active = {
                     sweep_dir: this._sweep_dir,
                     sweep_shift: this._sweep_shift,
-                    sweep_period: this._sweep_period,
-                    sweep_counter: this._sweep_counter,
+                    sweep_period: this._sweep_period ? this._sweep_period : 8,
+                    sweep_counter: this._sweep_period ? this._sweep_period : 8,
 
                     freq_internal: this._freq_internal,
                     
@@ -204,7 +204,7 @@ function tickAudio() {
 }
 
 function tickLength() {
-    
+
 }
 
 function tickVolEnv() {
@@ -216,6 +216,8 @@ function tickVolEnv() {
             audio_state.ch1.vol = audio_state.ch1._active.vol_internal;
         }
     }
+
+    // Channel 2
     if(audio_state.ch2._en && audio_state.ch2._active.env_period && audio_state.ch2._active.env_counter > 0 && --audio_state.ch2._active.env_counter === 0) {
         audio_state.ch2._active.env_counter = audio_state.ch2._active.env_period;
         if((audio_state.ch2._active.vol_internal < 0xf && audio_state.ch2._active.env_dir) || (audio_state.ch2._active.vol_internal > 0 && !audio_state.ch2._active.env_dir)) {
@@ -226,7 +228,19 @@ function tickVolEnv() {
 }
 
 function tickSweep() {
-
+    if(audio_state.ch1._en && audio_state.ch1._active.sweep_shift !== 0 && audio_state.ch1._active.sweep_period !== 0) {
+        if(audio_state.ch1._active.sweep_counter > 0 && --audio_state.ch1._active.sweep_counter === 0) {
+            audio_state.ch1._active.sweep_counter = audio_state.ch1._active.sweep_period;
+            let freq_change = audio_state.ch1._active.freq_internal >> audio_state.ch1._active.sweep_shift;
+            let new_freq = audio_state.ch1._active.freq_internal + (audio_state.ch1._active.sweep_dir ? -freq_change : freq_change);
+            if(new_freq < 0 || new_freq > 2047) {
+                audio_state.ch1._ctrl.gain.value = 0;
+                audio_state.ch1._active = null;
+                audio_state.ch1._en = false;
+            } else
+                audio_state.ch1.freq = audio_state.ch1._active.freq_internal = new_freq;
+        }
+    }
 }
 
 // Initialize global audio nodes
