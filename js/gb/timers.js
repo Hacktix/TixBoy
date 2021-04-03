@@ -45,7 +45,7 @@ function tickTimers(inc = true) {
     }
 
     // Check for APU update
-    let apu_tick_state = (timer_state._div_internal & 0b10000000000000) > 0;
+    let apu_tick_state = (timer_state._div_internal & 0b1000000000000) > 0;
     if(timer_state._last_apu_tick_state && !apu_tick_state)
         tickAudio();
     timer_state._last_apu_tick_state = apu_tick_state;
