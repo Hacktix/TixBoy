@@ -112,6 +112,10 @@ function readIO(addr) {
 }
 
 function readByte(addr) {
+    if(dma_state.dma_active && addr < 0xff00) {
+        if(addr < 0xfea0) return 0xff;
+        else return dma_state._bus_data
+    }
     if(addr < 0x100 && bootrom_mapped) return bootrom[addr];
     if(addr < 0x8000) return readRom(addr);           // ROM
     if(addr < 0xa000) return readVram(addr);          // VRAM
