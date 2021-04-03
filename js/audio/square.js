@@ -1,5 +1,5 @@
 const SQUARE_WAVE_DATA = {
-    "real": [
+    "real": new Float32Array([
     0.000000,
     0.000000,
     0.000000,
@@ -2048,8 +2048,8 @@ const SQUARE_WAVE_DATA = {
     0.000000,
     0.000000,
     0.000000
-    ],
-    "imag": [
+    ]),
+    "imag": new Float32Array([
     0.000000,
     0.318310,
     0.000000,
@@ -4098,6 +4098,6 @@ const SQUARE_WAVE_DATA = {
     0.000156,
     0.000000,
     0.000156
-    ]
+    ])
 }
 const SQUARE_WAVE = audioCtx.createPeriodicWave(SQUARE_WAVE_DATA.real, SQUARE_WAVE_DATA.imag);
