@@ -32,10 +32,5 @@ function readByteOAMDMA(addr) {
     if(addr < 0xa000) return readVram(addr);          // VRAM
     if(addr < 0xc000) return readSram(addr);          // SRAM (TODO: Add Support)
     if(addr < 0xe000) return readWram(addr);          // WRAM
-    if(addr < 0xfe00) return readWram(addr - 0x2000); // Echo RAM
-    if(addr < 0xfea0) return oam[addr-0xfe00];        // OAM
-    if(addr < 0xfeff) return 0xff;                    // "Not Usable" (TODO: Implement model-specific behavior)
-    if(addr < 0xff80) return readIO(addr);            // I/O Registers
-    if(addr < 0xffff) return hram[addr-0xff80];       // HRAM
-    return intr_state.ie;                             // IE
+    return readWram(addr - 0x2000);                   // Echo RAM / OAM
 }
