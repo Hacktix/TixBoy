@@ -167,6 +167,12 @@ function writeIO(addr, val) {
         case 0xff13: audio_state.ch1.nr13 = val; break;
         case 0xff14: audio_state.ch1.nr14 = val; break;
 
+        // Channel 2
+        case 0xff16: audio_state.ch2.nr21 = val; break;
+        case 0xff17: audio_state.ch2.nr22 = val; break;
+        case 0xff18: audio_state.ch2.nr23 = val; break;
+        case 0xff19: audio_state.ch2.nr24 = val; break;
+
         // Control Registers
         case 0xff24: audio_state.nr50 = val; break;
         case 0xff25: audio_state.nr51 = val; break;

@@ -25,6 +25,12 @@ var audio_state = {
         else try {this.ch1._ctrl.disconnect(this._so1_node);} catch(e){}
         if(v & (1 << 4)) try {this.ch1._ctrl.connect(this._so2_node);} catch(e){}
         else try {this.ch1._ctrl.disconnect(this._so2_node);} catch(e){}
+
+        // Channel 2
+        if(v & (1 << 1)) try {this.ch2._ctrl.connect(this._so1_node);} catch(e){}
+        else try {this.ch2._ctrl.disconnect(this._so1_node);} catch(e){}
+        if(v & (1 << 5)) try {this.ch2._ctrl.connect(this._so2_node);} catch(e){}
+        else try {this.ch2._ctrl.disconnect(this._so2_node);} catch(e){}
     },
 
     set nr52(v) {
@@ -115,10 +121,76 @@ var audio_state = {
             }
         }
     },
+
+    ch2: {
+        _active: null,
+        _en: false,
+        _osc: audioCtx.createOscillator(),
+        _gain: audioCtx.createGain(),
+        _ctrl: audioCtx.createGain(),
+
+        _vol_internal: 0,
+        _env_dir: 0,
+        _env_period: 0,
+        _env_counter: 0,
+        set vol(v) {
+            this._gain.gain.value = v ? v / 7 : 0
+        },
+
+        _len: 0,
+        _enable_len: false,
+
+        _freq_internal: 0,
+        set freq(v) {
+            this._osc.frequency.value = 131072/(2048-v);
+        },
+
+        set nr21(v) {
+            // TODO: Implement Wave Pattern Duty
+            this._len = v & 0b111111;
+        },
+
+        set nr22(v) {
+            this._vol_internal = (v & 0xf0) >> 4;
+            this._env_dir = (v & 0b1000) >> 3;
+            this._env_period = this._env_counter = (v & 0b111);
+        },
+
+        set nr23(v) {
+            this._freq_internal = (this._freq_internal & 0b11100000000) | v;
+        },
+
+        set nr24(v) {
+            this._freq_internal = (this._freq_internal & 0xff) | ((v & 0b111) << 8);
+            this._en = (v & 0x80);
+            this._enable_len = (v & 0x40);
+            if(this._en) {
+                this._ctrl.gain.value = 1;
+                this.vol = this._vol_internal;
+                this.freq = this._freq_internal;
+                this._active = {
+                    freq_internal: this._freq_internal,
+                    
+                    vol_internal: this._vol_internal,
+                    env_dir: this._env_dir,
+                    env_period: this._env_period,
+                    env_counter: this._env_counter,
+
+                    len: this._len,
+                    enable_len: this._enable_len
+                };
+            }
+            else {
+                this._ctrl.gain.value = 0;
+                this._active = null;
+            }
+        }
+    },
 }
 
 function initAudio() {
     audio_state.ch1._osc.start();
+    audio_state.ch2._osc.start();
 }
 
 function tickAudio() {
@@ -162,3 +234,8 @@ audio_state._global_gain_node.gain.value = 0.25;
 audio_state.ch1._osc.connect(audio_state.ch1._gain).connect(audio_state.ch1._ctrl);
 audio_state.ch1._osc.setPeriodicWave(SQUARE_WAVE);
 audio_state.ch1._gain.gain.value = 0;
+
+// Initialize Channel 2
+audio_state.ch2._osc.connect(audio_state.ch2._gain).connect(audio_state.ch2._ctrl);
+audio_state.ch2._osc.setPeriodicWave(SQUARE_WAVE);
+audio_state.ch2._gain.gain.value = 0;
