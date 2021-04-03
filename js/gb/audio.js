@@ -13,8 +13,8 @@ var audio_state = {
     _cycles: 0,
 
     set nr50(v) {
-        this._so2_gain.gain.value = (v & 0x70) ? 7 / ((v & 0x70) >> 4) : 0;
-        this._so1_gain.gain.value = (v & 0x7) ? 7 / (v & 0x7) : 0;
+        this._so2_gain.gain.value = (v & 0x70) ? ((v & 0x70) >> 4) / 7 : 0;
+        this._so1_gain.gain.value = (v & 0x7) ? (v & 0x7) / 7 : 0;
     },
 
     set nr51(v) {
