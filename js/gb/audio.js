@@ -216,6 +216,13 @@ function tickVolEnv() {
             audio_state.ch1.vol = audio_state.ch1._active.vol_internal;
         }
     }
+    if(audio_state.ch2._en && audio_state.ch2._active.env_period && audio_state.ch2._active.env_counter > 0 && --audio_state.ch2._active.env_counter === 0) {
+        audio_state.ch2._active.env_counter = audio_state.ch2._active.env_period;
+        if((audio_state.ch2._active.vol_internal < 0xf && audio_state.ch2._active.env_dir) || (audio_state.ch2._active.vol_internal > 0 && !audio_state.ch2._active.env_dir)) {
+            audio_state.ch2._active.vol_internal += audio_state.ch2._active.env_dir ? 1 : -1;
+            audio_state.ch2.vol = audio_state.ch2._active.vol_internal;
+        }
+    }
 }
 
 function tickSweep() {
