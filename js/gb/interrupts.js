@@ -5,10 +5,10 @@ var intr_state = {
     ime: false,
     ime_queue: 0,
 
-    get if() { return this._if; },
+    get if() { return this._if | 0xe0; },
     set if(v) { this._if = v & 0x1f; },
 
-    get ie() { return this._ie; },
+    get ie() { return this._ie | 0xe0; },
     set ie(v) { this._ie = v & 0x1f; },
 };
 

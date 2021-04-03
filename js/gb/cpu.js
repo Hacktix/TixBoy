@@ -123,11 +123,11 @@ function fetchInstruction() {
         intr_state.ime = true;
 
     // Handle Interrupts
-    if((skip_interrupt || intr_state.ime) && (intr_state.if & intr_state.ie) !== 0) {
+    if((skip_interrupt || intr_state.ime) && (intr_state._if & intr_state._ie) !== 0) {
         if(intr_state.ime) {
             let vec = 0x40;
             let bmp = 1;
-            while(((intr_state.if & intr_state.ie) & bmp) === 0) {
+            while(((intr_state._if & intr_state._ie) & bmp) === 0) {
                 bmp <<= 1;
                 vec += 0x8;
             }
