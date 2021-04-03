@@ -151,24 +151,28 @@ function writeIO(addr, val) {
     switch(addr) {
         case 0xff00: input_state.p1 = val; break;          // P1
 
-        // Timer Registers
+        // # Timer Registers
         case 0xff04: timer_state.div = val; break;         // DIV
         case 0xff05: timer_state.tima = val; break;        // TIMA
         case 0xff06: timer_state.tma = val; break;         // TMA
         case 0xff07: timer_state.tac = val; break;         // TAC
         case 0xff0f: intr_state.if = val; break;           // IF
 
-        // APU Registers
-        case 0xff12: audio_ch1.nr12 = val; break;
-        case 0xff13: audio_ch1.nr13 = val; break;
-        case 0xff14: audio_ch1.nr14 = val; break;
-        case 0xff17: audio_ch2.nr22 = val; break;
-        case 0xff18: audio_ch2.nr23 = val; break;
-        case 0xff19: audio_ch2.nr24 = val; break;
+        // # APU Registers
+        
+        // Channel 1
+        case 0xff10: audio_state.ch1.nr10 = val; break;
+        case 0xff11: audio_state.ch1.nr11 = val; break;
+        case 0xff12: audio_state.ch1.nr12 = val; break;
+        case 0xff13: audio_state.ch1.nr13 = val; break;
+        case 0xff14: audio_state.ch1.nr14 = val; break;
+
+        // Control Registers
         case 0xff24: audio_state.nr50 = val; break;
         case 0xff25: audio_state.nr51 = val; break;
+        case 0xff26: audio_state.nr52 = val; break;
 
-        // PPU Registers
+        // # PPU Registers
         case 0xff40: ppu_state.lcdc = val; break;          // LCDC
         case 0xff41: ppu_state.stat = val; break;          // STAT
         case 0xff42: ppu_state.scy = val; break;           // SCY

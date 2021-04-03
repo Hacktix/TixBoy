@@ -197,7 +197,5 @@ function execBlock() {
 // Function that starts a timer that continuously updates the CPU and all other components
 var intervalId = null;
 async function startCPU() {
-    audio_ch1._osc.start();
-    audio_ch2._osc.start();
     intervalId = setInterval(execBlock, (1/CLOCK_FREQ)*1000*BLOCK_SIZE);
 }

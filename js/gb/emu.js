@@ -27,6 +27,7 @@ document.getElementById('rom').addEventListener('change', (e) => {
     fr.addEventListener('load', (e) => {
         loadRom(new Uint8Array(e.target.result));
         startCPU();
+        initAudio();
         document.getElementsByTagName("body")[0].style.backgroundImage = "url('bgon.png')";
     });
     fr.readAsArrayBuffer(e.target.files[0]);

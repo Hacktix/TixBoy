@@ -1,6 +1,7 @@
 var timer_state = {
     // Internal timer variables
     _last_tick_state: false,
+    _last_apu_tick_state: false,
     _queued_reload: true,
 
     // DIV Register
@@ -42,6 +43,12 @@ function tickTimers(inc = true) {
             intr_state.if |= 0b100;
         }
     }
+
+    // Check for APU update
+    let apu_tick_state = (timer_state._div_internal & 0b10000000000000) > 0;
+    if(timer_state._last_apu_tick_state && !apu_tick_state)
+        tickAudio();
+    timer_state._last_apu_tick_state = apu_tick_state;
 
     // Check for falling edge
     let tick_state = ((timer_state._div_internal & (1 << [9, 3, 5, 7][timer_state.tac & 0b11])) > 0) && ((timer_state.tac & 0b100) > 0);
