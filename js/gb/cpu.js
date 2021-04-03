@@ -1,10 +1,8 @@
 const CLOCK_FREQ = 4194304/4;
-const BLOCK_SIZE = 5000;
+const BLOCK_SIZE = 50000;
 const DEBUG_LOG_DOWNLOAD = false;
 const DEBUG_LOG_LEN_LIMIT = 0;
 var CYCLE_COUNT = 0;
-
-const DEBUG_LOG_CHECKBOX = document.getElementById("logdownload");
 
 // Include other relevant things
 include('gb/instr/instrs.js');     // Instruction Mappings
@@ -186,16 +184,14 @@ function execBlock() {
     try {
         for(let i = 0; i < BLOCK_SIZE; i++)
             step();
+        window.requestAnimationFrame(execBlock);
     } catch(e) {
-        clearInterval(intervalId);
-        intervalId = null;
         if(DEBUG_LOG_DOWNLOAD) download("log.txt", dbg_log.join("\n"));
         console.error(e);
     }
 }
 
 // Function that starts a timer that continuously updates the CPU and all other components
-var intervalId = null;
 async function startCPU() {
-    intervalId = setInterval(execBlock, (1/CLOCK_FREQ)*1000*BLOCK_SIZE);
+    window.requestAnimationFrame(execBlock);
 }
