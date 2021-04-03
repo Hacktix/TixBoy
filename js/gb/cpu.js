@@ -1,5 +1,5 @@
 const CLOCK_FREQ = 4194304/4;
-const BLOCK_SIZE = 50000;
+const BLOCK_SIZE = 70224/4;
 const DEBUG_LOG_DOWNLOAD = false;
 const DEBUG_LOG_LEN_LIMIT = 0;
 var CYCLE_COUNT = 0;
@@ -192,6 +192,6 @@ function execBlock() {
 }
 
 // Function that starts a timer that continuously updates the CPU and all other components
-async function startCPU() {
+function startCPU() {
     window.requestAnimationFrame(execBlock);
 }
