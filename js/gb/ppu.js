@@ -266,7 +266,6 @@ function tickMode3() {
             // Check if HBlank should be entered
             if(ppu_state._lx === 160) {
                 ppu_state._mode = 0;
-                ppu_state._cycle = 0;
             }
         }
     }
@@ -314,7 +313,7 @@ function tickPPU() {
     ppu_state._last_stat_state = stat_state
 }
 
-async function drawPixel(r, g, b, x, y) {
+function drawPixel(r, g, b, x, y) {
     let pxBase = (4*x) + (4*160*y);
     lcdData.data[pxBase+0] = r;
     lcdData.data[pxBase+1] = g;
@@ -322,7 +321,7 @@ async function drawPixel(r, g, b, x, y) {
     lcdData.data[pxBase+3] = 255;
 }
 
-async function renderFrame() {
+function renderFrame() {
     tmplcd.putImageData(lcdData, 0, 0);
     lcd.drawImage(tmpcanvas, 0, 0, 160, 144)
 }
