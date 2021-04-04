@@ -22,7 +22,7 @@ var timer_state = {
 
     // TAC Register
     _tac: 0,
-    get tac() { return this._tac; },
+    get tac() { return this._tac | 0xf8; },
     set tac(v) {
         this._tac = v & 0b111;
         tickTimers(false);
