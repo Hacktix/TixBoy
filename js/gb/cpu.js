@@ -123,8 +123,8 @@ function fetchInstruction() {
         intr_state.ime = true;
 
     // Handle Interrupts
-    if((skip_interrupt || intr_state.ime) && (intr_state._if & intr_state._ie) !== 0) {
-        if(intr_state.ime) {
+    if((skip_interrupt || intr_state.ime) && (intr_state._if & intr_state._ie) !== 0 && readByte(registers.pc) !== 0xf3) {
+        if(!skip_interrupt) {
             let vec = 0x40;
             let bmp = 1;
             while(((intr_state._if & intr_state._ie) & bmp) === 0) {
