@@ -198,6 +198,7 @@ function writeIO(addr, val) {
 }
 
 function writeByte(addr, val) {
+    if(dma_state.dma_active && addr >= 0xfe00 && addr < 0xfea0) return;
     if(addr < 0x8000) writeRom(addr, val);                // ROM
     else if(addr < 0xa000) writeVram(addr, val);          // VRAM
     else if(addr < 0xc000) writeSram(addr, val);          // SRAM (TODO: Add Support)
