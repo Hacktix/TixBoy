@@ -7,6 +7,7 @@ var funcmap = {
     // DI
     0xf3: () => {
         intr_state.ime = false;
+        intr_state.ime_queue = 0;
         nextfunc = fetchInstruction;
     },
 
