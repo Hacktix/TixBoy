@@ -15,10 +15,29 @@ var wram = new Array(0x2000).fill(0);
 var oam = new Array(0xa0).fill(0);
 var hram = new Array(0x7f).fill(0);
 
+// Reset Memory State
+function resetMemoryState() {
+    // Memory Arrays
+    vram = new Array(0x2000).fill(0);
+    wram = new Array(0x2000).fill(0);
+    oam = new Array(0xa0).fill(0);
+    hram = new Array(0x7f).fill(0);
+    bootrom_mapped = true;
+
+    // Read/Write Functions
+    readRom = readRomNoMBC;
+    readVram = readVramDMG;
+    readSram = readSramUnmapped;
+    readWram = readWramDMG;
+    writeRom = function() {}
+    writeVram = writeVramDMG;
+    writeSram = function() {}
+    writeWram = writeWramDMG;
+}
+
 // Handler function for loading ROMs
 function loadRom(bytes) {
     rom = bytes;
-    console.log(`Loaded ${bytes.length} bytes.`);
 
     // Determine MBC and update read/write functions accordingly
     switch(rom[0x147]) {
@@ -60,24 +79,20 @@ function loadRom(bytes) {
 
 
 // Variable readRom function, adjustable for MBCs
-var readRom = function(addr) {
-    return rom[addr];
-};
+function readRomNoMBC(addr) { return rom[addr]; }
+var readRom = readRomNoMBC;
 
 // Variable readVram function, adjustable for CGB-mode
-var readVram = function(addr) {
-    return vram[addr-0x8000];
-}
+function readVramDMG(addr) { return vram[addr-0x8000]; }
+var readVram = readVramDMG;
 
 // Variable readSram function, adjustable for MBCs
-var readSram = function(addr) {
-    return 0xff;
-}
+function readSramUnmapped() { return 0xff; }
+var readSram = readSramUnmapped;
 
 // Variable readWram function, adjustable for CGB-mode
-var readWram = function(addr) {
-    return wram[addr-0xc000];
-}
+function readWramDMG(addr) { return wram[addr - 0xc000]; }
+var readWram = readWramDMG;
 
 // Fixed function for reading from I/O registers
 function readIO(addr) {
@@ -129,22 +144,20 @@ function readByte(addr) {
 
 
 // Variable writeRom function, adjustable for MBCs
-var writeRom = function(addr, val) {
+var writeRom = function() {
     // Ignore Writes to ROM
 }
 
 // Variable writeVram function, adjustable for CGB-mode
-var writeVram = function(addr, val) {
-    vram[addr-0x8000] = val;
-}
+function writeVramDMG(addr, val) { vram[addr-0x8000] = val; }
+var writeVram = writeVramDMG;
 
 // Variable writeSram function, adjustable for MBCs
 var writeSram = function(addr, val) { }
 
 // Variable writeWram function, adjustable for CGB-mode
-var writeWram = function(addr, val) {
-    wram[addr-0xc000] = val;
-}
+function writeWramDMG(addr, val) { wram[addr-0xc000] = val; }
+var writeWram = writeWramDMG;
 
 // Fixed function for writing to I/O registers
 function writeIO(addr, val) {

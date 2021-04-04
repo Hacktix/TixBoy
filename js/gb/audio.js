@@ -188,9 +188,47 @@ var audio_state = {
     },
 }
 
+function resetAudio() {
+    audio_state._en_global = false;
+    audio_state._cycles = 0;
+    audio_state._global_gain_node.gain.value = 0;
+
+    // Channel 1
+    audio_state.ch1._active = null;
+    audio_state.ch1._en = false;
+    audio_state.ch1._sweep_counter = 0;
+    audio_state.ch1._sweep_dir = 0;
+    audio_state.ch1._sweep_period = 0;
+    audio_state.ch1._sweep_shift = 0;
+    audio_state.ch1._vol_internal = 0;
+    audio_state.ch1._env_counter = 0;
+    audio_state.ch1._env_dir = 0;
+    audio_state.ch1._env_period = 0;
+    audio_state.ch1._len = 0;
+    audio_state.ch1._enable_len = false;
+    audio_state.ch1._freq_internal = 0;
+    audio_state.ch1.freq = 0;
+    audio_state.ch1.vol = 0;
+
+    // Channel 2
+    audio_state.ch2._active = null;
+    audio_state.ch2._en = false;
+    audio_state.ch2._vol_internal = 0;
+    audio_state.ch2._env_counter = 0;
+    audio_state.ch2._env_dir = 0;
+    audio_state.ch2._env_period = 0;
+    audio_state.ch2._len = 0;
+    audio_state.ch2._enable_len = false;
+    audio_state.ch2._freq_internal = 0;
+    audio_state.ch2.freq = 0;
+    audio_state.ch2.vol = 0;
+}
+
 function initAudio() {
-    audio_state.ch1._osc.start();
-    audio_state.ch2._osc.start();
+    try {
+        audio_state.ch1._osc.start();
+        audio_state.ch2._osc.start();
+    } catch(e) {}
 }
 
 function tickAudio() {

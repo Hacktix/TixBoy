@@ -47,6 +47,57 @@ var ppu_state = {
     obp1: 0,
 };
 
+function resetPPUState() {
+    ppu_state = {
+        // Internal Variables
+        _cycle: 0,
+        _bg_fifo: [],
+        _sprite_fifo: [],
+        _lx: 0,
+        _fetcher_x: 0,
+        _fetcher_state: 0,
+        _fetcher_tileno: null,
+        _fetcher_data_lo: null,
+        _fetcher_data_hi: null,
+        _fetcher_win: false,
+        _wly: 0,
+        _last_stat_state: false,
+        _sprite_buffer: [],
+        _fetcher_sprites: false,
+        _fetcher_sprites_state: 0,
+        _fetcher_sprites_sprite: null,
+        _fetcher_sprites_data_lo: null,
+        _fetcher_sprites_data_hi: null,
+        _reset: false,
+    
+        // LCDC
+        lcdc: 0x80,
+    
+        // STAT
+        _stat: 0,
+        _mode: 0,
+        get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
+        set stat(v) { this._stat = (v & 0b1111000); },
+    
+        // Scrolling
+        scx: 0,
+        scy: 0,
+    
+        // Window
+        wy: 0,
+        wx: 0,
+    
+        // LY
+        ly: 0,
+        lyc: 0,
+    
+        // DMG Palettes
+        bgp: 0,
+        obp0: 0,
+        obp1: 0,
+    };
+}
+
 function updatePPU() {
     if(ppu_state.lcdc & 0b10000000) {
         if(ppu_state._reset) {

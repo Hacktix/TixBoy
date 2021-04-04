@@ -14,6 +14,24 @@ var dma_state = {
     dma_active: false,
 }
 
+function resetOAMDMAState() {
+    dma_state = {
+        _dma_queue: 0,
+        _dma_queue_ptr: 0,
+        _dma_src_ptr: 0,
+        _read_data: 0xff,
+        _bus_data: 0xff,
+    
+        set dma_queue(v) {
+            this._read_data = v;
+            this._dma_queue = 2;
+            this._dma_queue_ptr = v << 8;
+        },
+    
+        dma_active: false,
+    }
+}
+
 function updateOAMDMA() {
     if(dma_state.dma_active) {
         oam[dma_state._dma_src_ptr & 0xff] = dma_state._bus_data = readByteOAMDMA(dma_state._dma_src_ptr++);

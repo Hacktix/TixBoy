@@ -25,13 +25,38 @@ document.getElementById('rom').addEventListener('change', (e) => {
         return;
     const fr = new FileReader();
     fr.addEventListener('load', (e) => {
-        loadRom(new Uint8Array(e.target.result));
-        startCPU();
-        initAudio();
-        document.getElementsByTagName("body")[0].style.backgroundImage = "url('bgon.png')";
+        resetEmulator(new Uint8Array(e.target.result));
     });
     fr.readAsArrayBuffer(e.target.files[0]);
 });
 
 document.onkeydown = handleKeyDown;
 document.onkeyup = handleKeyUp;
+
+// Reset Emulator State
+var resettingEmulator = false;
+var startedOnce = false;
+var waitForShutdownInterval = null;
+function resetEmulator(newRom) {
+    if(startedOnce === true)
+        resettingEmulator = true;
+    waitForShutdownInterval = setInterval(waitForShutdown, 50, newRom);
+}
+
+function waitForShutdown(newRom) {
+    if(resettingEmulator === true && startedOnce === true)
+        return;
+    clearInterval(waitForShutdownInterval);
+    resetMemoryState();
+    loadRom(newRom);
+    resetAudio();
+    resetTimers();
+    resetRegistersCPU();
+    resetInterruptState();
+    resetOAMDMAState();
+    resetPPUState();
+    startedOnce = true;
+    startCPU();
+    initAudio();
+    document.getElementsByTagName("body")[0].style.backgroundImage = "url('bgon.png')";
+}
