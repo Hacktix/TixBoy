@@ -154,7 +154,6 @@ function fetchInstruction() {
 
     // Decode & Run Opcode
     let opcode = readByte(registers.pc++);
-    if(registers.pc === 0xfe01) console.log(opcode.toString(16))
     if(halt_bug) {
         halt_bug = false;
         registers.pc--;
