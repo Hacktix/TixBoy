@@ -1,28 +1,29 @@
 var dma_state = {
     _dma_queue: 0,
+    _dma_queue_ptr: 0,
     _dma_src_ptr: 0,
     _read_data: 0xff,
     _bus_data: 0xff,
 
     set dma_queue(v) {
         this._read_data = v;
-        if(!this.dma_active) {
-            this._dma_queue = 3;
-            this._dma_src_ptr = v << 8;
-        }
+        this._dma_queue = 2;
+        this._dma_queue_ptr = v << 8;
     },
 
     dma_active: false,
 }
 
 function updateOAMDMA() {
-    if(--dma_state._dma_queue === 0)
-        dma_state.dma_active = true;
-
     if(dma_state.dma_active) {
         oam[dma_state._dma_src_ptr & 0xff] = dma_state._bus_data = readByteOAMDMA(dma_state._dma_src_ptr++);
         if((dma_state._dma_src_ptr & 0xff) == 0xa0)
             dma_state.dma_active = false;
+    }
+
+    if(dma_state._dma_queue > 0 && --dma_state._dma_queue === 0) {
+        dma_state.dma_active = true;
+        dma_state._dma_src_ptr = dma_state._dma_queue_ptr;
     }
 }
 
