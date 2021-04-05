@@ -10,11 +10,7 @@ var bootrom = bootr_dmg;
 var bootrom_mapped = true;
 
 // Variables for memory sections (ROM, RAM, etc.)
-var rom = null;
-var vram = new Array(0x2000).fill(0);
-var wram = new Array(0x2000).fill(0);
-var oam = new Array(0xa0).fill(0);
-var hram = new Array(0x7f).fill(0);
+var rom, vram, wram, oam, hram = null;
 
 // Reset Memory State
 function resetMemoryState() {

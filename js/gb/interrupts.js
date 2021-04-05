@@ -1,16 +1,5 @@
 // Interrupt-related CPU variables
-var intr_state = {
-    _if: 0,
-    _ie: 0,
-    ime: false,
-    ime_queue: 0,
-
-    get if() { return this._if | 0xe0; },
-    set if(v) { this._if = v & 0x1f; },
-
-    get ie() { return this._ie; },
-    set ie(v) { this._ie = v; },
-};
+var intr_state = null;
 
 function resetInterruptState() {
     intr_state = {

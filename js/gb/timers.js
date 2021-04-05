@@ -1,36 +1,4 @@
-var timer_state = {
-    // Internal timer variables
-    _last_tick_state: false,
-    _last_apu_tick_state: false,
-    _queued_reload: true,
-
-    // DIV Register
-    _div_internal: 0,
-    get div() { return (this._div_internal & 0xff00) >> 8; },
-    set div(v) {
-        this._div_internal = 0;
-        tickTimers(false);
-    },
-
-    // TIMA Register
-    _tima: 0,
-    get tima() { return this._tima; },
-    set tima(v) {
-        this._tima = v;
-        this._queued_reload = false;
-    },
-
-    // TAC Register
-    _tac: 0,
-    get tac() { return this._tac | 0xf8; },
-    set tac(v) {
-        this._tac = v & 0b111;
-        tickTimers(false);
-    },
-
-    // TMA Register
-    tma: 0
-};
+var timer_state = null;
 
 function resetTimers() {
     timer_state = {
