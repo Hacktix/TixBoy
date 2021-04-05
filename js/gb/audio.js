@@ -88,6 +88,7 @@ var audio_state = {
 
         set nr13(v) {
             this._freq_internal = (this._freq_internal & 0b11100000000) | v;
+            this.freq = this._freq_internal;
         },
 
         set nr14(v) {
@@ -114,10 +115,6 @@ var audio_state = {
                     len: 64-this._len,
                     enable_len: this._enable_len
                 };
-            }
-            else {
-                this._ctrl.gain.value = 0;
-                this._active = null;
             }
         }
     },
@@ -158,6 +155,7 @@ var audio_state = {
 
         set nr23(v) {
             this._freq_internal = (this._freq_internal & 0b11100000000) | v;
+            this.freq = this._freq_internal;
         },
 
         set nr24(v) {
@@ -179,10 +177,6 @@ var audio_state = {
                     len: 64-this._len,
                     enable_len: this._enable_len
                 };
-            }
-            else {
-                this._ctrl.gain.value = 0;
-                this._active = null;
             }
         }
     },
