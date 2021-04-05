@@ -11,6 +11,7 @@ var ppu_state = {
     _fetcher_data_hi: null,
     _fetcher_win: false,
     _wly: 0,
+    _win_trigger_wy: false,
     _last_stat_state: false,
     _sprite_buffer: [],
     _fetcher_sprites: false,
@@ -61,6 +62,7 @@ function resetPPUState() {
         _fetcher_data_hi: null,
         _fetcher_win: false,
         _wly: 0,
+        _win_trigger_wy: false,
         _last_stat_state: false,
         _sprite_buffer: [],
         _fetcher_sprites: false,
@@ -118,6 +120,8 @@ function updatePPU() {
 
 function tickMode2() {
     // OAM Scan Mode
+    if(ppu_state._win_trigger_wy === false && ppu_state._cycle === 0)
+        ppu_state._win_trigger_wy = ppu_state.wy === ppu_state.ly
     if(++ppu_state._cycle === 80) {
         ppu_state._mode = 3;
         ppu_state._bg_fifo = [];
@@ -236,7 +240,7 @@ function tickMode3() {
     }
 
     // Check for window to be fetched
-    if((ppu_state.lcdc & 0b100000) && ppu_state._fetcher_win === false && ppu_state.ly >= ppu_state.wy && (ppu_state._lx) >= (ppu_state.wx - 7)) {
+    if((ppu_state.lcdc & 0b100000) && ppu_state._fetcher_win === false && ppu_state._win_trigger_wy === true && (ppu_state._lx) >= (ppu_state.wx - 7)) {
         ppu_state._fetcher_win = true;
         ppu_state._fetcher_state = 0;
         ppu_state._fetcher_x = 0;
@@ -337,6 +341,7 @@ function tickMode0() {
 
 function tickMode1() {
     // VBlank Mode
+    ppu_state._win_trigger_wy = false;
     if(++ppu_state._cycle === 456) {
         ppu_state._cycle = 0;
         if(++ppu_state.ly === 154) {
