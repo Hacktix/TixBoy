@@ -1,5 +1,5 @@
 const GLOBAL_GAIN = audioCtx.createGain();
-const GLOBAL_VOL = 0.05;
+const GLOBAL_VOL = 0.1;
 GLOBAL_GAIN.gain.value = GLOBAL_VOL;
 
 var audio_state = {
@@ -76,7 +76,7 @@ var audio_state = {
         },
 
         set nr11(v) {
-            // TODO: Implement Wave Pattern Duty
+            this._osc.setPeriodicWave(SQUARE_WAVES[(v & 0b11000000) >> 6]);
             this._len = v & 0b111111;
         },
 
@@ -143,7 +143,7 @@ var audio_state = {
         },
 
         set nr21(v) {
-            // TODO: Implement Wave Pattern Duty
+            this._osc.setPeriodicWave(SQUARE_WAVES[(v & 0b11000000) >> 6]);
             this._len = v & 0b111111;
         },
 
@@ -297,10 +297,10 @@ audio_state._global_gain_node.gain.value = 0.25;
 
 // Initialize Channel 1
 audio_state.ch1._osc.connect(audio_state.ch1._gain).connect(audio_state.ch1._ctrl);
-audio_state.ch1._osc.setPeriodicWave(SQUARE_WAVE);
+audio_state.ch1._osc.setPeriodicWave(SQUARE_WAVES[0]);
 audio_state.ch1._gain.gain.value = 0;
 
 // Initialize Channel 2
 audio_state.ch2._osc.connect(audio_state.ch2._gain).connect(audio_state.ch2._ctrl);
-audio_state.ch2._osc.setPeriodicWave(SQUARE_WAVE);
+audio_state.ch2._osc.setPeriodicWave(SQUARE_WAVES[0]);
 audio_state.ch2._gain.gain.value = 0;
