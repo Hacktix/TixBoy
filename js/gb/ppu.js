@@ -115,6 +115,8 @@ function updatePPU() {
         ppu_state.ly = 0;
         ppu_state._cycle = 0;
         ppu_state._reset = true;
+        lcd.fillStyle = 'rgb(255, 255, 255)';
+        lcd.fillRect(0, 0, 160, 144);
     }
 }
 
