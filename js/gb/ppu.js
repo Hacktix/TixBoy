@@ -111,6 +111,7 @@ function tickMode2() {
                     attr: oam[i+3]
                 });
         }
+        ppu_state._sprite_buffer.sort((a,b) => a.x - b.x);
     }
 }
 
@@ -120,9 +121,9 @@ function tickMode3() {
 
     // Check if sprites need to be fetched
     if(ppu_state._sprite_buffer.length > 0 && (ppu_state.lcdc & 0b10) && ppu_state._fetcher_sprites === false) {
-        let render_sprite = ppu_state._sprite_buffer.findIndex((spr) => spr.x <= ((ppu_state._lx) + 8));
-        if(render_sprite !== -1) {
-            ppu_state._fetcher_sprites_sprite = ppu_state._sprite_buffer.splice(render_sprite, 1)[0];
+        let render_sprite = ppu_state._sprite_buffer[0].x <= ((ppu_state._lx) + 8) ? ppu_state._sprite_buffer[0] : null;
+        if(render_sprite !== null) {
+            ppu_state._fetcher_sprites_sprite = ppu_state._sprite_buffer.shift();
             ppu_state._fetcher_sprites_state = 0;
             ppu_state._fetcher_sprites = true;
         }
@@ -159,6 +160,8 @@ function tickMode3() {
             case 5: 
                 return;
             case 6:
+                return;
+            case 7:
                 if((ppu_state._fetcher_sprites_sprite.attr & 0b100000)) {
                     for(let i = 0x1, j=0; i > 0; i <<= 1, j++) {
                         let px = {
