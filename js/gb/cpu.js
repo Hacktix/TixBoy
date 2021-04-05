@@ -247,7 +247,7 @@ function fetchInstruction() {
         throw "Log length limit reached."
 
     // Breakpoints
-    if(!bootrom_mapped && debug_brk.includes(registers.pc) && intervalId !== null)
+    if(!bootrom_mapped && debug_brk.includes(registers.pc))
         throw `Breakpoint hit: $${registers.pc.toString(16).padStart(4, '0')}`;
 
     // Decode & Run Opcode
