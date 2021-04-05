@@ -20,6 +20,7 @@ var ppu_state = {
     _fetcher_sprites_data_lo: null,
     _fetcher_sprites_data_hi: null,
     _reset: false,
+    _first_line: true,
 
     // LCDC
     lcdc: 0x80,
@@ -27,7 +28,7 @@ var ppu_state = {
     // STAT
     _stat: 0,
     _mode: 0,
-    get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
+    get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | (this._first_line === true && this._mode === 2 ? 0 : this._mode); },
     set stat(v) { this._stat = (v & 0b1111000); },
 
     // Scrolling
@@ -71,6 +72,7 @@ function resetPPUState() {
         _fetcher_sprites_data_lo: null,
         _fetcher_sprites_data_hi: null,
         _reset: false,
+        _first_line: true,
     
         // LCDC
         lcdc: 0x80,
@@ -78,7 +80,7 @@ function resetPPUState() {
         // STAT
         _stat: 0,
         _mode: 0,
-        get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | this._mode; },
+        get stat() { return 0x80 | this._stat | (this.ly === this.lyc ? 0b100 : 0) | (this._first_line === true && this._mode === 2 ? 0 : this._mode); },
         set stat(v) { this._stat = (v & 0b1111000); },
     
         // Scrolling
@@ -105,6 +107,7 @@ function updatePPU() {
         if(ppu_state._reset) {
             ppu_state._reset = false;
             ppu_state._mode = 2;
+            ppu_state._first_line = true;
         }
         tickPPU();
         tickPPU();
@@ -333,6 +336,7 @@ function tickMode0() {
     if(++ppu_state._cycle === 456) {
         ppu_state._cycle = 0;
         ppu_state._mode = (++ppu_state.ly === 144) ? 1 : 2;
+        ppu_state._first_line = false;
         if(ppu_state._fetcher_win === true)
             ppu_state._wly++;
         if(ppu_state._mode === 1) {
