@@ -1,5 +1,6 @@
 // Import MBCs
 include('gb/mbc/mbc1.js');
+include('gb/mbc/mbc2.js');
 include('gb/mbc/mbc3.js');
 include('gb/mbc/mbc5.js');
 
@@ -49,6 +50,14 @@ function loadRom(bytes) {
             readSram = MBC1.readSram;
             writeRom = MBC1.writeRom;
             writeSram = MBC1.writeSram;
+            break;
+        case 0x05:
+        case 0x06:
+            MBC2.init();
+            readRom = MBC2.readRom;
+            readSram = MBC2.readSram;
+            writeRom = MBC2.writeRom;
+            writeSram = MBC2.writeSram;
             break;
         case 0x0f:
         case 0x10:
