@@ -23,7 +23,7 @@ var funcmap = {
         if(intr_state.ime) cpu_halted = true;
         else {
             if((intr_state._ie & intr_state._if) === 0) skip_interrupt = cpu_halted = true;
-            else halt_bug = true;
+            else skip_interrupt = cpu_halted = true;
         }
         nextfunc = fetchInstruction;
     },
