@@ -26,7 +26,7 @@ function resetPPUState() {
         _first_line: true,
     
         // LCDC
-        lcdc: 0x80,
+        lcdc: 0,
     
         // STAT
         _stat: 0,
