@@ -91,27 +91,30 @@ function tickMode2() {
 
         // Buffer sprites for scanline
         ppu_state._sprite_buffer = [];
-        for(let i = 0; i < 0xa0 && ppu_state._sprite_buffer.length < 10; i += 4) {
-            if(oam[i+1] && (ppu_state.ly + 16) >= oam[i] && (ppu_state.ly + 16) < (oam[i] + ((ppu_state.lcdc & 0b100) ? 16 : 8)))
-                ppu_state._sprite_buffer.push({
-                    y: oam[i],
-                    x: oam[i+1],
-                    tile: (ppu_state.lcdc & 0b100)
-                            ? (((ppu_state.ly + 16) < (oam[i]-8))
-                                ? ((oam[i+3] & 0b1000000)
-                                    ? (oam[i+2] | 0x01)
-                                    : (oam[i+2] | 0x01)
+        if(dma_state.dma_active === false) {
+            for(let i = 0; i < 0xa0 && ppu_state._sprite_buffer.length < 10; i += 4) {
+                if(oam[i+1] && (ppu_state.ly + 16) >= oam[i] && (ppu_state.ly + 16) < (oam[i] + ((ppu_state.lcdc & 0b100) ? 16 : 8)))
+                    ppu_state._sprite_buffer.push({
+                        y: oam[i],
+                        x: oam[i+1],
+                        tile: (ppu_state.lcdc & 0b100)
+                                ? (((ppu_state.ly + 16) < (oam[i]-8))
+                                    ? ((oam[i+3] & 0b1000000)
+                                        ? (oam[i+2] | 0x01)
+                                        : (oam[i+2] | 0x01)
+                                    )
+                                    : ((oam[i+3] & 0b1000000)
+                                        ? (oam[i+2] & 0xfe)
+                                        : (oam[i+2] & 0xfe)
+                                    )
                                 )
-                                : ((oam[i+3] & 0b1000000)
-                                    ? (oam[i+2] & 0xfe)
-                                    : (oam[i+2] & 0xfe)
-                                )
-                            )
-                            : oam[i+2],
-                    attr: oam[i+3]
-                });
-        }
-        ppu_state._sprite_buffer.sort((a,b) => a.x - b.x);
+                                : oam[i+2],
+                        attr: oam[i+3]
+                    });
+            }
+            ppu_state._sprite_buffer.sort((a,b) => a.x - b.x);
+        } else
+            ppu_state._sprite_buffer = [];
     }
 }
 
