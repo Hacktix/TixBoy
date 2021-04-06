@@ -16,10 +16,14 @@ var rom, vram, wram, oam, hram = null;
 function resetMemoryState() {
     // Memory Arrays
     vram = new Array(0x2000).fill(0);
-    wram = new Array(0x2000).fill(0);
+    wram = new Array(0x2000);
     oam = new Array(0xa0).fill(0);
-    hram = new Array(0x7f).fill(0);
+    hram = new Array(0x7f);
     bootrom_mapped = true;
+
+    // Randomize uninitialized RAM
+    randomizeRam(wram);
+    randomizeRam(hram);
 
     // Read/Write Functions
     readRom = readRomNoMBC;
@@ -30,6 +34,11 @@ function resetMemoryState() {
     writeVram = writeVramDMG;
     writeSram = function() {}
     writeWram = writeWramDMG;
+}
+
+function randomizeRam(ram) {
+    for(let i = 0; i < ram.length; i++)
+        ram[i] = Math.floor(Math.random() * 0xff);
 }
 
 // Handler function for loading ROMs
