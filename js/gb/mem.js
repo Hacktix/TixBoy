@@ -88,7 +88,7 @@ function readRomNoMBC(addr) { return rom[addr]; }
 var readRom = readRomNoMBC;
 
 // Variable readVram function, adjustable for CGB-mode
-function readVramDMG(addr) { return vram[addr-0x8000]; }
+function readVramDMG(addr) { return ppu_state._mode === 3 ? 0xff : vram[addr-0x8000]; }
 var readVram = readVramDMG;
 
 // Variable readSram function, adjustable for MBCs
@@ -139,7 +139,9 @@ function readByte(addr) {
     if(addr < 0xc000) return readSram(addr);          // SRAM (TODO: Add Support)
     if(addr < 0xe000) return readWram(addr);          // WRAM
     if(addr < 0xfe00) return readWram(addr - 0x2000); // Echo RAM
-    if(addr < 0xfea0) return oam[addr-0xfe00];        // OAM
+    if(addr < 0xfea0)                                 // OAM
+        if(![2,3].includes(ppu_state._mode)) return oam[addr-0xfe00];
+        else return 0xff;
     if(addr < 0xfeff) return 0xff;                    // "Not Usable" (TODO: Implement model-specific behavior)
     if(addr < 0xff80) return readIO(addr);            // I/O Registers
     if(addr < 0xffff) return hram[addr-0xff80];       // HRAM
@@ -154,7 +156,7 @@ var writeRom = function() {
 }
 
 // Variable writeVram function, adjustable for CGB-mode
-function writeVramDMG(addr, val) { vram[addr-0x8000] = val; }
+function writeVramDMG(addr, val) { if(ppu_state._mode !== 3) vram[addr-0x8000] = val; }
 var writeVram = writeVramDMG;
 
 // Variable writeSram function, adjustable for MBCs
@@ -222,7 +224,9 @@ function writeByte(addr, val) {
     else if(addr < 0xc000) writeSram(addr, val);          // SRAM (TODO: Add Support)
     else if(addr < 0xe000) writeWram(addr, val);          // WRAM
     else if(addr < 0xfe00) writeWram(addr - 0x2000, val); // Echo RAM
-    else if(addr < 0xfea0) oam[addr-0xfe00] = val;        // OAM
+    if(addr < 0xfea0)                                     // OAM
+        if(![2,3].includes(ppu_state._mode)) oam[addr-0xfe00] = val;
+        else return;
     else if(addr < 0xfeff) return;                        // "Not Usable" (TODO: Implement model-specific behavior)
     else if(addr < 0xff80) writeIO(addr, val);            // I/O Registers
     else if(addr < 0xffff) hram[addr-0xff80] = val;       // HRAM
