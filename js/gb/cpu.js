@@ -113,12 +113,14 @@ function resetRegistersCPU() {
     nextfunc = fetchInstruction;
     dbg_log = [];
     CYCLE_COUNT = 0;
+    count_cycles = true;
 }
 
 // Boolean flags related to HALT mode
 var cpu_halted = false;
 var skip_interrupt = false;
 var halt_bug = false;
+var count_cycles = true;
 
 // Function pointer showing what to do on the next tick
 var nextfunc = fetchInstruction;
@@ -175,7 +177,7 @@ function fetchInstruction() {
 
 // Wrapper for a single next-tick-function call
 function step() {
-    CYCLE_COUNT++;
+    if(count_cycles === true) CYCLE_COUNT++;
     nextfunc();
     tickTimers();
     updatePPU();
