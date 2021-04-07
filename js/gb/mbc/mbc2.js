@@ -1,7 +1,7 @@
 class MBC2 {
 
-    static init() {
-        MBC2._ram = new Array(512).fill(0);
+    static init(savefile) {
+        MBC2._ram = savefile === null ? new Array(512).fill(0) : savefile;
         MBC2._romb = 1;
         MBC2._enram = false;
     }
@@ -32,5 +32,7 @@ class MBC2 {
         if(MBC2._enram === true)
             MBC2._ram[addr & 0x1ff] = val | 0xf0;
     }
+
+    static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC2._ram); }
 
 }

@@ -11,6 +11,7 @@ var bootrom_mapped = true;
 
 // Variables for memory sections (ROM, RAM, etc.)
 var rom, vram, wram, oam, hram = null;
+var savefile = null;
 
 // Reset Memory State
 function resetMemoryState() {
@@ -46,34 +47,38 @@ function loadRom(bytes) {
     rom = bytes;
 
     // Determine MBC and update read/write functions accordingly
+    let saveCallback = null;
     switch(rom[0x147]) {
         case 0x01:
         case 0x02:
         case 0x03:
-            MBC1.init(rom[0x147] === 0x01 ? 0 : rom[0x149], rom[0x148]);
+            MBC1.init(rom[0x147] === 0x01 ? 0 : rom[0x149], rom[0x148], savefile);
             readRom = MBC1.readRom;
             readSram = MBC1.readSram;
             writeRom = MBC1.writeRom;
             writeSram = MBC1.writeSram;
+            if(rom[0x147] === 0x03) saveCallback = MBC1.save;
             break;
         case 0x05:
         case 0x06:
-            MBC2.init();
+            MBC2.init(savefile);
             readRom = MBC2.readRom;
             readSram = MBC2.readSram;
             writeRom = MBC2.writeRom;
             writeSram = MBC2.writeSram;
+            if(rom[0x147] === 0x06) saveCallback = MBC2.save;
             break;
         case 0x0f:
         case 0x10:
         case 0x11:
         case 0x12:
         case 0x13:
-            MBC3.init([0x0f, 0x11].includes(rom[0x147]) ? 0 : rom[0x149], rom[0x148]);
+            MBC3.init([0x0f, 0x11].includes(rom[0x147]) ? 0 : rom[0x149], rom[0x148], savefile);
             readRom = MBC3.readRom;
             readSram = MBC3.readSram;
             writeRom = MBC3.writeRom;
             writeSram = MBC3.writeSram;
+            if([0x0f, 0x10, 0x13].includes(rom[0x147])) saveCallback = MBC3.save;
             break;
         case 0x19:
         case 0x1a:
@@ -81,13 +86,15 @@ function loadRom(bytes) {
         case 0x1c:
         case 0x1d:
         case 0x1e:
-            MBC5.init([0x19, 0x1c].includes(rom[0x147]) ? 0 : rom[0x149], rom[0x148]);
+            MBC5.init([0x19, 0x1c].includes(rom[0x147]) ? 0 : rom[0x149], rom[0x148], savefile);
             readRom = MBC5.readRom;
             readSram = MBC5.readSram;
             writeRom = MBC5.writeRom;
             writeSram = MBC5.writeSram;
+            if([0x1b, 0x1e].includes(rom[0x147])) saveCallback = MBC5.save;
             break;
     }
+    enableSavefileDownload(saveCallback);
 }
 
 

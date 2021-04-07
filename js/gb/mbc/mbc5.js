@@ -1,8 +1,8 @@
 class MBC5 {
 
-    static init(ram, rom) {
+    static init(ram, rom, savefile) {
         MBC5._ramsize = ram;
-        MBC5._ram = new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0);
+        MBC5._ram = savefile === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : savefile;
         MBC5._romsize = rom;
 
         MBC5._romb = 1;
@@ -37,4 +37,6 @@ class MBC5 {
         if(!MBC5._enram || MBC5._ram.length === 0) return;
         MBC5._ram[(0x2000 * MBC5._ramb + addr - 0xa000) % MBC5._ram.length] = val;
     }
+
+    static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC5._ram); }
 }

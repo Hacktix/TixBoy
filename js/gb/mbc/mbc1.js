@@ -1,8 +1,8 @@
 class MBC1 {
 
-    static init(ram, rom) {
+    static init(ram, rom, savefile) {
         MBC1._ramsize = ram;
-        MBC1._ram = new Array([0, 2048, 8192, 32768][ram]).fill(0);
+        MBC1._ram = savefile === null ? new Array([0, 2048, 8192, 32768][ram]).fill(0) : savefile;
         MBC1._romsize = rom;
 
         MBC1._romb = 1;
@@ -55,5 +55,7 @@ class MBC1 {
                 MBC1._ram[(addr - 0xa000) % MBC1._ram.length] = val;
         }
     }
+
+    static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC1._ram); }
 
 }

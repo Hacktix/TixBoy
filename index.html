@@ -12,6 +12,7 @@
     
     <script src="js/include.js"></script>
     <script src="js/e8.js"></script>
+    <script src="js/b64.js"></script>
     <script src="js/dyndown.js"></script>
     <script src="js/sinc.js"></script>
 
@@ -23,7 +24,20 @@
     <canvas id="lcd" width="640" height="576"></canvas>
     <br>
     <input type="file" class="fileinput" id="rom"></input>
-    <label for="rom">Choose a ROM</label>
+    <label for="rom" class="tooltip">
+        Choose a ROM
+        <span class="tooltiptext">Select Save File first if needed!</span>
+    </label>
+    <input type="file" class="fileinput" id="load"></input>
+    <label id="loadlabel" for="load" class="tooltip">
+        Select Save File
+    </label>
+    <div id="savediv" style="display: none;">
+        <input type="button" class="fileinput" id="save" style="display: none;"></input>
+        <label for="save" class="tooltip">
+            Download Save File
+        </label>
+    </div>
 </body>
 
 <script src="js/gb/input.js"></script>

@@ -1,8 +1,8 @@
 class MBC3 {
 
-    static init(ram, rom) {
+    static init(ram, rom, savefile) {
         MBC3._ramsize = ram;
-        MBC3._ram = new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0);
+        MBC3._ram = savefile === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : savefile;
         MBC3._romsize = rom;
 
         MBC3._romb = 1;
@@ -40,4 +40,6 @@ class MBC3 {
         if(!MBC3._enram || MBC3._ram.length === 0) return;
         MBC3._ram[(0x2000 * MBC3._ramb + addr - 0xa000) % MBC3._ram.length] = val;
     }
+
+    static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC3._ram); }
 }
