@@ -1,9 +1,11 @@
 class MBC2 {
 
     static init(savefile) {
-        MBC2._ram = savefile === null ? new Array(512).fill(0) : savefile;
+        MBC2._ram = savefile === null ? window.localStorage.getItem(ROM_FILENAME) === null ? new Array(512).fill(0) : base64ToBytes(window.localStorage.getItem(ROM_FILENAME)) : savefile;
         MBC2._romb = 1;
         MBC2._enram = false;
+
+        window.onbeforeunload = MBC2.saveLocalStorage;
     }
 
     static writeRom(addr, val) {
@@ -34,5 +36,7 @@ class MBC2 {
     }
 
     static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC2._ram); }
+
+    static saveLocalStorage() { window.localStorage.setItem(ROM_FILENAME, bytesToBase64(MBC2._ram)); }
 
 }

@@ -2,7 +2,7 @@ class MBC3 {
 
     static init(ram, rom, savefile) {
         MBC3._ramsize = ram;
-        MBC3._ram = savefile === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : savefile;
+        MBC3._ram = savefile === null ? window.localStorage.getItem(ROM_FILENAME) === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : base64ToBytes(window.localStorage.getItem(ROM_FILENAME)) : savefile;
         MBC3._romsize = rom;
 
         MBC3._romb = 1;
@@ -28,6 +28,8 @@ class MBC3 {
             dl: 0b11111111,
             dh: 0b11000001,
         }
+
+        window.onbeforeunload = MBC3.saveLocalStorage;
     }
 
     static writeRom(addr, val) {
@@ -128,4 +130,6 @@ class MBC3 {
     }
 
     static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC3._ram); }
+
+    static saveLocalStorage() { window.localStorage.setItem(ROM_FILENAME, bytesToBase64(MBC3._ram)); }
 }

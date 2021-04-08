@@ -2,12 +2,14 @@ class MBC5 {
 
     static init(ram, rom, savefile) {
         MBC5._ramsize = ram;
-        MBC5._ram = savefile === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : savefile;
+        MBC5._ram = savefile === null ? window.localStorage.getItem(ROM_FILENAME) === null ? new Array([0, 2048, 8192, 32768, 131072, 65536][ram]).fill(0) : base64ToBytes(window.localStorage.getItem(ROM_FILENAME)) : savefile;
         MBC5._romsize = rom;
 
         MBC5._romb = 1;
         MBC5._ramb = 0;
         MBC5._enram = false;
+
+        window.onbeforeunload = MBC5.saveLocalStorage;
     }
 
     static writeRom(addr, val) {
@@ -39,4 +41,6 @@ class MBC5 {
     }
 
     static save() { downloadBinary(`${ROM_FILENAME}.sav`, MBC5._ram); }
+
+    static saveLocalStorage() { window.localStorage.setItem(ROM_FILENAME, bytesToBase64(MBC5._ram)); }
 }
