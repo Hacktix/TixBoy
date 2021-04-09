@@ -143,6 +143,10 @@ function readIO(addr) {
         case 0xff4a: return ppu_state.wy;             // WY
         case 0xff4b: return ppu_state.wx;             // WX
 
+        // Audio Registers
+        case 0xff24: return audio_state._nr50;
+        case 0xff25: return audio_state._nr51;
+
         default:     return 0xff;                     // Unmapped Register
     }
 }

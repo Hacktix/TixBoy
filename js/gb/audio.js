@@ -12,13 +12,18 @@ var audio_state = {
     _en_global: false,
     _cycles: 0,
 
+    _nr50: 0,
     set nr50(v) {
+        this._nr50 = v;
         this._so2_gain.gain.value = (v & 0x70) ? ((v & 0x70) >> 4) / 7 : 0;
         this._so1_gain.gain.value = (v & 0x7) ? (v & 0x7) / 7 : 0;
     },
+    get nr50() { return this._nr50; },
 
+    _nr51: 0,
     set nr51(v) {
         // TODO: Implement sound selection for other channels
+        this._nr51 = v;
 
         // Channel 1
         if(v & (1 << 0)) try {this.ch1._ctrl.connect(this._so1_node);} catch(e){}
@@ -32,6 +37,7 @@ var audio_state = {
         if(v & (1 << 5)) try {this.ch2._ctrl.connect(this._so2_node);} catch(e){}
         else try {this.ch2._ctrl.disconnect(this._so2_node);} catch(e){}
     },
+    get nr51() { return this._nr51; },
 
     set nr52(v) {
         this._en_global = (v & 0x80) > 0;
