@@ -2,7 +2,7 @@ var input_state = {
     _input_state: 0xff,
     _p1: 0xff,
 
-    get p1() { return (this._p1 & 0xf0) | ((this._p1 & 0b100000) === 0 ? ((this._input_state & 0xf0) >> 4) : (this._input_state & 0xf)); },
+    get p1() { return (this._p1 & 0xf0) | ((this._p1 & 0b100000) === 0 ? ((this._input_state & 0xf0) >> 4) : (this._p1 & 0b10000) === 0 ? (this._input_state & 0xf) : ((this._input_state & 0xf0) >> 4) | (this._input_state & 0xf)); },
     set p1(v) { this._p1 = (v & 0b00110000) | 0b11001111; },
 }
 
