@@ -307,13 +307,16 @@ function tickMode1() {
     ppu_state._win_trigger_wy = false;
     if(++ppu_state._cycle === 456) {
         ppu_state._cycle = 0;
-        if(++ppu_state.ly === 154) {
-            ppu_state.ly = 0;
+        if(ppu_state.ly === 0) {
             ppu_state._wly = 0;
             ppu_state._mode = 2;
             renderFrame();
-        }
+        } else
+            ppu_state.ly++;
     }
+    
+    if(ppu_state.ly === 153 && ppu_state._cycle === 4)
+        ppu_state.ly = 0;
 }
 
 const ppu_funcmap = [tickMode0, tickMode1, tickMode2, tickMode3];
